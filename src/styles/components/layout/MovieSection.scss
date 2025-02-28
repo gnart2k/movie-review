@@ -1,0 +1,43 @@
+@import '@/styles/_variables.scss';
+.movie-section {
+  * {
+    color: $white;
+  }
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+  width: calc(100% - 50px);
+
+
+  h2 {
+    margin: 0;
+    padding: 10px 8px;
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  .movie-list {
+    display: flex;
+    overflow: hidden;
+    overflow-x: auto;
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+  }
+  .movie-card {
+    min-width: 120px;
+    max-height: 240px;
+  }
+}
+
+@media (max-width: 600px) {
+  .movie-section {
+    h2{
+      text-align: center;
+    }
+    .movie-card{
+      min-width: 100px;
+      max-height: 200px;
+    }
+  }
+}
