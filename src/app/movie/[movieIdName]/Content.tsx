@@ -20,6 +20,7 @@ import facebook_icon from "@/assets/image/facebook_icon.png";
 import twitterx_icon from "@/assets/image/twitterx_icon.png";
 import instagram_icon from "@/assets/image/instagram_icon.png";
 import link_icon from "@/assets/image/link_icon.png";
+import CommentCard from "@/components/card/comment-card/CommentCard";
 
 //Abbriviation Map
 const abbreviationMap = LanguageAbbrevations();
@@ -50,7 +51,6 @@ function Content(props: ContentProps) {
   // console.log("Cast slice: ", cast_slice);
   const images = props.images?.backdrops ?? [];
   const image_slice = images.slice(0, 15);
-
   return (
     <div className="content_wrapper">
       <section className="left">
@@ -81,8 +81,10 @@ function Content(props: ContentProps) {
         <section className="social_panel">
           <section className="review">
             <div className="menu">
-              <h3>Social</h3>
-              <h4>Review</h4>
+              <h3>Social Review</h3>
+            </div>
+            <div className="content">
+              <CommentCard filmId={props.credits?.id} />
             </div>
             <div className="content">
               <ReviewCard reviews={props.reviews} />
@@ -172,9 +174,9 @@ function Content(props: ContentProps) {
           {props.details.budget === 0
             ? "-"
             : props.details.budget.toLocaleString("en-US", {
-                style: "currency",
-                currency: "USD",
-              })}
+              style: "currency",
+              currency: "USD",
+            })}
         </p>
         <p>
           <strong>Revenue</strong>
@@ -182,9 +184,9 @@ function Content(props: ContentProps) {
           {props.details.revenue === 0
             ? "-"
             : props.details.revenue.toLocaleString("en-US", {
-                style: "currency",
-                currency: "USD",
-              })}
+              style: "currency",
+              currency: "USD",
+            })}
         </p>
 
         <section className="keywords_panel">

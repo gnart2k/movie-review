@@ -12,6 +12,7 @@ import {
   fetchMovieImages,
 } from "@/lib/api/movieDataAPI";
 import Spinner from "@/components/ui/Spinner";
+import { getListReview } from "@/app/actions/review/review-action";
 
 const MovieData = async ({ movieId, movieName }: { movieId: number, movieName: string }) => {
   console.log("MovieName:", movieName);
@@ -34,7 +35,8 @@ const MovieData = async ({ movieId, movieName }: { movieId: number, movieName: s
       fetchMovieRecommendations(movieId),
       fetchMovieReleaseDate(movieId),
       fetchMovieVideo(movieId),
-      fetchMovieReviews(movieId),
+      getListReview(movieId),
+      // fetchMovieReviews(movieId),
       fetchMovieExternalIds(movieId),
       fetchMovieImages(movieId),
     ]);
@@ -62,8 +64,8 @@ const MovieData = async ({ movieId, movieName }: { movieId: number, movieName: s
   }
 };
 
-const Page = ({ params }: { params: { movieIdName: string } }) => {
-  const { movieIdName } = params;
+const Page = async ({ params }: { params: { movieIdName: string } }) => {
+  const { movieIdName } = await params;
   const [movieId, ...movieNameParts] = movieIdName.split("-");
   const movieName = movieNameParts.join(" ");
 

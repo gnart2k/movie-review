@@ -6,6 +6,7 @@ import HandleClick from "@/lib/utils/HandleClick";
 import { Navbar } from "@/components/layout";
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import favicon from '../../public/favicon/favicon.ico';
+import { ClerkProvider } from '@clerk/nextjs'
 
 export const metadata: Metadata = {
   title: "MoviesHQ",
@@ -17,13 +18,15 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${GeistSans.variable}`} suppressHydrationWarning>
-      <body suppressHydrationWarning>
-        <Navbar />
-        <HandleClick />
-        {children}
-        <SpeedInsights />
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" className={`${GeistSans.variable}`} suppressHydrationWarning>
+        <body suppressHydrationWarning>
+          <Navbar />
+          <HandleClick />
+          {children}
+          <SpeedInsights />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

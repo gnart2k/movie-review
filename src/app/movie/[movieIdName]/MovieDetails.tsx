@@ -159,7 +159,7 @@ function MovieDetail({
     return (
       <div>
         {/* <Navbar /> */}
-        <div className="nav_cover"></div>
+        <div className="nav_cover text-white"></div>
         Loading...
       </div>
     );
@@ -167,7 +167,7 @@ function MovieDetail({
 
   return (
     <div>
-      <main className="movies_detail">
+      <main className="movies_detail text-white">
         <div className="bg_wrapper" ref={refBG}>
           <div className="bg_blur">
             <div className="orignal_header">
@@ -277,8 +277,8 @@ const PosterHeader: React.FC<PosterHeaderProps> = ({
         </section>
         <nav className="action">
           <ul>
-            <li className="rating">
-              <div className="circular_bar">
+            <li className="flex rating">
+              <div className="w-[68px] h-[68px]">
                 <CircularProgressBar
                   percentage={Math.floor(movieDetails.vote_average * 10)}
                   color={"rgb(33,208,122)"}
