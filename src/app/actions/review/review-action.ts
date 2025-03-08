@@ -46,7 +46,7 @@ async function createReview({ filmId, content }: { filmId?: number, content: str
     }
 }
 
-async function deleteReview(reviewId: string) {
+async function deleteReview({ reviewId }: { reviewId: string }) {
     try {
         await prisma.review.delete({ where: { id: reviewId } });
         return { data: {}, isSuccess: true, message: 'Delete review successful.' }

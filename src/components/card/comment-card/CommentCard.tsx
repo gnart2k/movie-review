@@ -4,10 +4,10 @@ import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
-function CommentCard({ filmId }: { filmId: number | undefined }) {
+function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp, ratingProp }: { filmId: number | undefined, isEdit?: boolean, setEdit?: Function, updateReviewHandler?: Function, contentProp?: string, ratingProp?: number }) {
 
-    const [content, setContent] = useState("");
-    const [rating, setRating] = useState(0);
+    const [content, setContent] = useState(contentProp ?? "");
+    const [rating, setRating] = useState(ratingProp ?? 0);
     const { user } = useUser();
 
     async function createReviewHandler() {
@@ -19,7 +19,7 @@ function CommentCard({ filmId }: { filmId: number | undefined }) {
     }
 
     return (
-        <form className="my-6 w-4/5 ml-6" onSubmit={createReviewHandler}>
+        <form className="my-6 w-4/5 ml-6" onSubmit={isEdit ? () => updateReviewHandler?.(content, rating) : createReviewHandler}>
             <div className="flex items-center mb-4">
                 <span className="flex flex-row-reverse">
                     <svg className={"w-4 h-4 ms-1 cursor-pointer peer peer-hover:text-yellow-300 hover:text-yellow-300 duration-100" + (rating >= 10 ? " text-yellow-300" : "text-gray-300")} onClick={() => setRating(10)} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
@@ -51,6 +51,11 @@ function CommentCard({ filmId }: { filmId: number | undefined }) {
                 className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-black bg-white rounded-lg focus:ring-4">
                 Post comment
             </button>
+            {isEdit && <button type="button"
+                onClick={() => setEdit?.(false)}
+                className="inline-flex ml-4 items-center py-2.5 px-4 text-xs font-medium text-center text-black bg-stone-200 rounded-lg focus:ring-4">
+                Cancel
+            </button>}
         </form>)
 }
 
