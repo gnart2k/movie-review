@@ -9,8 +9,8 @@ import favicon from '../../public/favicon/favicon.ico';
 import { ClerkProvider } from '@clerk/nextjs'
 
 export const metadata: Metadata = {
-  title: "MoviesHQ",
-  description: "Site To get Movies Details",
+  title: "Movie Review",
+  description: "Reivew any movie you like",
   icons: [{ rel: "icon", url: favicon.src }],
 };
 
