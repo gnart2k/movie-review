@@ -18,6 +18,11 @@ const config = {
                 hostname: 'www.themoviedb.org',
                 pathname: '/**',
             },
+            {
+                protocol: 'https',
+                hostname: 'img.clerk.com',
+                pathname: '/**',
+            },
         ],
     },
 };

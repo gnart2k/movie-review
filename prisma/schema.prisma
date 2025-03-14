@@ -16,21 +16,20 @@ datasource db {
 model AuthorDetails {
   id          String  @id @default(uuid())
   name        String?
-  username    String  @unique
+  username    String
   avatar_path String?
   rating      Int?
 
-  reviews    Review[]
-  ReviewLike ReviewLike[]
+  reviews Review[]
 }
 
 model Review {
   id              String        @id @default(uuid())
   filmId          Int
   author          String
-  author_details  AuthorDetails @relation(fields: [authorDetailsId], references: [id])
+  author_details  AuthorDetails @relation(fields: [authorDetailsId], references: [id], onDelete: Cascade)
   authorDetailsId String
-  content         String
+  content         String        @db.Text
   created_at      DateTime      @default(now())
   updated_at      DateTime      @updatedAt
   url             String
@@ -39,10 +38,11 @@ model Review {
 }
 
 model ReviewLike {
-  id            Int           @id @default(autoincrement())
-  authorId      String
-  authorDetails AuthorDetails @relation(fields: [authorId], references: [id])
-  reviewId      String
-  review        Review        @relation(fields: [reviewId], references: [id])
-  createdAt     DateTime      @default(now())
+  id        Int      @id @default(autoincrement())
+  userId    String
+  reviewId  String
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, reviewId])
 }

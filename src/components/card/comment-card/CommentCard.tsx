@@ -1,25 +1,77 @@
 "use client";
-import { createReview } from "@/app/actions/review/review-action";
-import { RedirectToSignIn, useUser } from "@clerk/nextjs";
-import { useRouter } from "next/router";
+import api from "@/lib/utils/axiosInstance";
+import { useUser } from "@clerk/nextjs";
 import { useState } from "react";
 
-function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp, ratingProp }: { filmId: number | undefined, isEdit?: boolean, setEdit?: Function, updateReviewHandler?: Function, contentProp?: string, ratingProp?: number }) {
+interface Review {
+    author: string;
+    author_details: AuthorDetails;
+    content: string;
+    created_at: string;
+    id: string;
+    updated_at: string;
+    url: string;
+}
+
+interface AuthorDetails {
+    name: string | null;
+    username: string;
+    avatar_path: string | null;
+    rating: number | null;
+}
+
+function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp, ratingProp, setIsOpen, setReviews }: { filmId: number | undefined, isEdit?: boolean, setEdit?: Function, updateReviewHandler?: Function, contentProp?: string, ratingProp?: number, setIsOpen?: Function, setReviews?: Function }) {
 
     const [content, setContent] = useState(contentProp ?? "");
     const [rating, setRating] = useState(ratingProp ?? 0);
     const { user } = useUser();
 
-    async function createReviewHandler() {
-        if (!user) {
-            return
-        }
+    async function createReviewHandler(event: React.FormEvent) {
+        event.preventDefault();
+        if (!user) return;
 
-        await createReview({ filmId: filmId, content: content }, { id: user.id, name: user.fullName ?? "", username: user.username ?? "", avatar_path: user.imageUrl, rating: rating });
+        try {
+            const response = await api.post("/reviews", {
+                filmId: filmId,
+                content: content,
+                author: {
+                    id: user.id,
+                    name: user.fullName ?? "",
+                    username: user.primaryEmailAddress?.toString() ?? "",
+                    avatar_path: user.imageUrl,
+                    rating: rating,
+                },
+            });
+
+            if (response.data.success) {
+                const reviewCreated: Review = response.data.data;
+                setReviews?.((prev: Review[]) => [{
+                    author: reviewCreated.author,
+                    author_details: {
+                        name: reviewCreated.author,
+                        username: user.primaryEmailAddress?.toString() ?? "",
+                        avatar_path: user.imageUrl,
+                        rating: rating,
+                    },
+                    content: reviewCreated.content,
+                    created_at: reviewCreated.created_at,
+                    id: reviewCreated.id,
+                    updated_at: reviewCreated.updated_at,
+                    url: reviewCreated.url,
+                    likes: []
+                }, ...prev]);
+                setContent("");
+                setRating(0);
+            } else {
+                console.error("Failed to create review:", response.data.message);
+            }
+        } catch (error) {
+            console.error("Error creating review:", error);
+        }
     }
 
     return (
-        <form className="my-6 w-4/5 ml-6" onSubmit={isEdit ? () => updateReviewHandler?.(content, rating) : createReviewHandler}>
+        <form className="my-6 w-4/5 ml-6" onSubmit={isEdit ? (e) => updateReviewHandler?.(e, content, rating) : (e) => createReviewHandler(e)}>
             <div className="flex items-center mb-4">
                 <span className="flex flex-row-reverse">
                     <svg className={"w-4 h-4 ms-1 cursor-pointer peer peer-hover:text-yellow-300 hover:text-yellow-300 duration-100" + (rating >= 10 ? " text-yellow-300" : "text-gray-300")} onClick={() => setRating(10)} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
@@ -49,10 +101,10 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
             </div>
             <button type="submit"
                 className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-black bg-white rounded-lg focus:ring-4">
-                Post comment
+                {isEdit ? "Update" : "Post Comment"}
             </button>
             {isEdit && <button type="button"
-                onClick={() => setEdit?.(false)}
+                onClick={() => { setEdit?.(false); setIsOpen?.(false); }}
                 className="inline-flex ml-4 items-center py-2.5 px-4 text-xs font-medium text-center text-black bg-stone-200 rounded-lg focus:ring-4">
                 Cancel
             </button>}

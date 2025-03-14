@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "@/styles/pages/Content.scss";
 import UserCard from "@/components/card/usercard/UserCard";
 import ReviewCard from "@/components/card/reviewcard/ReviewCard";
@@ -21,6 +21,8 @@ import twitterx_icon from "@/assets/image/twitterx_icon.png";
 import instagram_icon from "@/assets/image/instagram_icon.png";
 import link_icon from "@/assets/image/link_icon.png";
 import CommentCard from "@/components/card/comment-card/CommentCard";
+import api from "@/lib/utils/axiosInstance";
+import { useUser } from "@clerk/nextjs";
 
 //Abbriviation Map
 const abbreviationMap = LanguageAbbrevations();
@@ -46,6 +48,69 @@ interface ContentProps {
 }
 
 function Content(props: ContentProps) {
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useUser();
+  console.log("This is reviews: " + reviews)
+  console.log("This is email: " + user?.primaryEmailAddress
+  )
+  useEffect(() => {
+    const fetchReviews = async () => {
+      if (!props.credits?.id) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await api.get(`/reviews?filmId=${props.credits.id}`);
+        setReviews(response.data.data ?? []);
+        console.log("Fetched reviews:", response.data);
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const insertReviews = async () => {
+      if (!props.reviews || props.reviews.length === 0) return;
+      try {
+        await Promise.all(
+          props.reviews.map((review) =>
+            api.post(`/reviews/${review.id}`, {
+              filmId: props.credits?.id,
+              content: review.content,
+              created_at: review.created_at,
+              updated_at: review.updated_at,
+              url: review.url,
+              author: {
+                id: review.author_details.username,
+                name: review.author_details.name ?? "",
+                username: review.author_details.username ?? "",
+                avatar_path: review.author_details.avatar_path ?? "",
+                rating: review.author_details.rating,
+              },
+            })
+          )
+        );
+        console.log("All reviews created successfully");
+
+      } catch (error) {
+        console.error("Error creating reviews:", error);
+      } finally {
+        // Gọi lại fetchReviews để cập nhật dữ liệu mới
+        fetchReviews();
+      }
+    };
+
+    fetchReviews();
+
+    if (props.reviews && props.reviews.length > 0) {
+      insertReviews();
+    }
+  }, [props.credits?.id, props.reviews]);
+
+  if (loading) return <div>Loading...</div>;
   const cast = props.credits?.cast ?? [];
   const cast_slice = cast.slice(0, 9);
   // console.log("Cast slice: ", cast_slice);
@@ -80,14 +145,14 @@ function Content(props: ContentProps) {
         {/* For Review of the movie */}
         <section className="social_panel">
           <section className="review">
-            <div className="menu">
+            <div className="menu mb-2">
               <h3>Social Review</h3>
             </div>
+            {reviews.find(x => x.author_details.username === user?.primaryEmailAddress?.toString()) ? <></> : <div className="content">
+              <CommentCard filmId={props.credits?.id} setReviews={setReviews} />
+            </div>}
             <div className="content">
-              <CommentCard filmId={props.credits?.id} />
-            </div>
-            <div className="content">
-              <ReviewCard reviews={props.reviews} />
+              <ReviewCard reviews={reviews} userId={user?.id} setReviews={setReviews} />
             </div>
           </section>
         </section>

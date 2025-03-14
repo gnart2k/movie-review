@@ -35,8 +35,7 @@ const MovieData = async ({ movieId, movieName }: { movieId: number, movieName: s
       fetchMovieRecommendations(movieId),
       fetchMovieReleaseDate(movieId),
       fetchMovieVideo(movieId),
-      getListReview(movieId),
-      // fetchMovieReviews(movieId),
+      fetchMovieReviews(movieId),
       fetchMovieExternalIds(movieId),
       fetchMovieImages(movieId),
     ]);

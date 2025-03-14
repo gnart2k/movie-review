@@ -40,12 +40,13 @@ export default function SearchBar({ onSubmit }: SearchBarProps) {
         autoComplete="off"
         id="input"
         type="search"
-        placeholder="Search 'Top Comedy Movies'"
+        placeholder="Search 'Avatar 2'"
         value={searchValue}
         onChange={handleChange}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
       />
+
       <button type="submit" className="search-button" aria-label="Search">
         <svg
           className="search-icon"
