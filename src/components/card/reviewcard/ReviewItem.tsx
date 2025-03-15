@@ -12,8 +12,7 @@ function ReviewItem({ item, formatDate, setReviews }: { item: any, formatDate: F
     const [isEdit, setIsEdit] = useState(false);
     const { isSignedIn, userId } = useAuth();
     const { user } = useUser();
-    const [toggleLike, setToggleLike] = useState(false)
-
+    const [toggleLike, setToggleLike] = useState(item.likes.find((like: any) => like.userId === userId) ? true : false);
     async function toggleLikeHandler(reviewId: string) {
         if (!isSignedIn) return;
 
@@ -171,7 +170,7 @@ function ReviewItem({ item, formatDate, setReviews }: { item: any, formatDate: F
                     <div className="text_review pt-2 flex content-center">
                         <span>{totalLike}</span>
                         <button className="ml-3" onClick={() => toggleLikeHandler(item.id)}>
-                            {toggleLike ? "🤍" : "❤️"}
+                            {toggleLike ? "❤️" : "🤍"}
                         </button>
                     </div>
                 </>

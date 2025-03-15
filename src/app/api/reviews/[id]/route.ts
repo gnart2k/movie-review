@@ -1,6 +1,7 @@
 import { createResponse } from "@/lib/utils/createResponse";
 import prisma from "@/prismaClient";
 import { NextRequest } from "next/server";
+import { skip } from "node:test";
 import { z } from "zod"; // Thư viện kiểm tra dữ liệu đầu vào
 
 // Schema kiểm tra dữ liệu đầu vào khi update review
@@ -84,9 +85,12 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
  */
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
     try {
-        if (!params?.id) return createResponse(false, "Review ID is required", {}, 400);
-
-        const id = await params.id;
+        //if (!params?.id) return createResponse(false, "Review ID is required", {}, 400);
+        // if(!params){
+        //     return
+        // }
+        const injectedParams = await params;
+        const id = await injectedParams.id;
         const body = await req.json();
         const parsed = reviewSchema.safeParse(body);
         if (!parsed.success) {
@@ -95,9 +99,9 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         console.log(id);
         const { filmId, content, author, created_at, updated_at, url } = parsed.data;
 
-        if (await prisma.review.findFirst({
-            where: { id }
-        })) return createResponse(false, "Reviews existed!", {}, 400);
+        // if (await prisma.review.findFirst({
+        //     where: { id }
+        // })) return createResponse(true, "Reviews existed!", {}, 200);
 
         const authorDetails = await prisma.authorDetails.create({
             data: {
@@ -120,9 +124,11 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
                 created_at,
                 updated_at
             },
-        });
+        },
+    
+    );
 
-        return createResponse(true, "Review created successfully", review, 201);
+        return createResponse(true, "Review created successfully", {}, 201);
     } catch (error) {
         console.error(error);
         return createResponse(false, "Internal server error", {}, 500);

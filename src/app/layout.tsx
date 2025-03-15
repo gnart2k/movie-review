@@ -7,6 +7,7 @@ import { Navbar } from "@/components/layout";
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import favicon from '../../public/favicon/favicon.ico';
 import { ClerkProvider } from '@clerk/nextjs'
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "Movie Review",
@@ -25,6 +26,7 @@ export default function RootLayout({
           <HandleClick />
           {children}
           <SpeedInsights />
+        <Toaster/>
         </body>
       </html>
     </ClerkProvider>

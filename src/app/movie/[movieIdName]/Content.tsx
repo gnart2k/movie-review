@@ -51,9 +51,10 @@ function Content(props: ContentProps) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useUser();
-  console.log("This is reviews: " + reviews)
-  console.log("This is email: " + user?.primaryEmailAddress
-  )
+
+  console.log("Email current user: ", user?.primaryEmailAddress );
+  console.log("This is reviews: ", props.reviews)
+
   useEffect(() => {
     const fetchReviews = async () => {
       if (!props.credits?.id) {
@@ -75,30 +76,12 @@ function Content(props: ContentProps) {
     const insertReviews = async () => {
       if (!props.reviews || props.reviews.length === 0) return;
       try {
-        await Promise.all(
-          props.reviews.map((review) =>
-            api.post(`/reviews/${review.id}`, {
-              filmId: props.credits?.id,
-              content: review.content,
-              created_at: review.created_at,
-              updated_at: review.updated_at,
-              url: review.url,
-              author: {
-                id: review.author_details.username,
-                name: review.author_details.name ?? "",
-                username: review.author_details.username ?? "",
-                avatar_path: review.author_details.avatar_path ?? "",
-                rating: review.author_details.rating,
-              },
-            })
-          )
-        );
-        console.log("All reviews created successfully");
-
+        await api.post("/reviews/insert",
+          { filmId: props.credits?.id, reviews: props.reviews });
+        console.log("Insert reviews success!");
       } catch (error) {
         console.error("Error creating reviews:", error);
       } finally {
-        // Gọi lại fetchReviews để cập nhật dữ liệu mới
         fetchReviews();
       }
     };

@@ -2,6 +2,7 @@
 import api from "@/lib/utils/axiosInstance";
 import { useUser } from "@clerk/nextjs";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 interface Review {
     author: string;
@@ -70,8 +71,17 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
         }
     }
 
+    const handleSubmit = (e:any)=>{
+        if(!user){
+            toast.error("Please login to review film")
+            return
+        }
+        //@ts-ignore
+        return isEdit ? updateReviewHandler?.(e, content, rating) : createReviewHandler(e)
+    }
+
     return (
-        <form className="my-6 w-4/5 ml-6" onSubmit={isEdit ? (e) => updateReviewHandler?.(e, content, rating) : (e) => createReviewHandler(e)}>
+        <form className="my-6 w-4/5 ml-6" onSubmit={(e)=> handleSubmit(e)}>
             <div className="flex items-center mb-4">
                 <span className="flex flex-row-reverse">
                     <svg className={"w-4 h-4 ms-1 cursor-pointer peer peer-hover:text-yellow-300 hover:text-yellow-300 duration-100" + (rating >= 10 ? " text-yellow-300" : "text-gray-300")} onClick={() => setRating(10)} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
