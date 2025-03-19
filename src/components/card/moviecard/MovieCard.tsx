@@ -73,7 +73,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, isLoading }) => {
   if (movie) {
     const { title, poster_path, vote_average, id } = movie;
 
-    if (!id || !title || !poster_path || vote_average === 0) {
+    if (!id || !title || !poster_path) {
       return null;
     }
   }

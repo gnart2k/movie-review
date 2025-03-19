@@ -30,7 +30,7 @@ const abbreviationMap = LanguageAbbrevations();
 interface ContentProps {
   credits: MovieCreditsResponse | null;
   images: MovieImageResponse | null;
-  reviews: MovieReviewResponse["results"] | null;
+  reviews: Review[] | null;
   recommendations: Movie[] | null;
   links: {
     facebook: string;
@@ -45,55 +45,21 @@ interface ContentProps {
     revenue: number;
   };
   keywords: Keyword[] | null;
+  user: any | null;
+  setReviews: Function;
 }
 
+
 function Content(props: ContentProps) {
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { user } = useUser();
 
-  console.log("Email current user: ", user?.primaryEmailAddress );
-  console.log("This is reviews: ", props.reviews)
+  // if (loading) return (
+  //   <div>
+  //     {/* <Navbar /> */}
+  //     <div className="nav_cover text-white"></div>
+  //     Loading...
+  //   </div>
+  // );
 
-  useEffect(() => {
-    const fetchReviews = async () => {
-      if (!props.credits?.id) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const response = await api.get(`/reviews?filmId=${props.credits.id}`);
-        setReviews(response.data.data ?? []);
-        console.log("Fetched reviews:", response.data);
-      } catch (error) {
-        console.error("Error fetching reviews:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const insertReviews = async () => {
-      if (!props.reviews || props.reviews.length === 0) return;
-      try {
-        await api.post("/reviews/insert",
-          { filmId: props.credits?.id, reviews: props.reviews });
-        console.log("Insert reviews success!");
-      } catch (error) {
-        console.error("Error creating reviews:", error);
-      } finally {
-        fetchReviews();
-      }
-    };
-
-    fetchReviews();
-
-    if (props.reviews && props.reviews.length > 0) {
-      insertReviews();
-    }
-  }, [props.credits?.id, props.reviews]);
-
-  if (loading) return <div>Loading...</div>;
   const cast = props.credits?.cast ?? [];
   const cast_slice = cast.slice(0, 9);
   // console.log("Cast slice: ", cast_slice);
@@ -131,11 +97,11 @@ function Content(props: ContentProps) {
             <div className="menu mb-2">
               <h3>Social Review</h3>
             </div>
-            {reviews.find(x => x.author_details.username === user?.primaryEmailAddress?.toString()) ? <></> : <div className="content">
-              <CommentCard filmId={props.credits?.id} setReviews={setReviews} />
+            {props.reviews?.find(x => x.author_details.username === props.user?.primaryEmailAddress?.toString()) ? <></> : <div className="content">
+              <CommentCard filmId={props.credits?.id} setReviews={props.setReviews} cast = {props.credits?.cast}/>
             </div>}
-            <div className="content">
-              <ReviewCard reviews={reviews} userId={user?.id} setReviews={setReviews} />
+            <div className="">
+              <ReviewCard reviews={props.reviews} username={props.user?.primaryEmailAddress?.toString()} setReviews={props.setReviews} />
             </div>
           </section>
         </section>

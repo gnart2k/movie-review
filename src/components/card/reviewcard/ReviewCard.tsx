@@ -4,7 +4,7 @@ import React, { useMemo } from "react";
 import "@/styles/components/cards/ReviewCard.scss";
 import ReviewItem from "./ReviewItem";
 
-function ReviewCard({ reviews, userId, setReviews }: { filmId?: number, reviews: Review[], userId?: string | null, setReviews: Function }) {
+function ReviewCard({ reviews, username, setReviews }: { filmId?: number, reviews: Review[] | null, username?: string | null, setReviews: Function }) {
 
     const formatDate = useMemo(
         () => (dateString: string) =>
@@ -12,15 +12,13 @@ function ReviewCard({ reviews, userId, setReviews }: { filmId?: number, reviews:
         []
     );
 
-    if (reviews.length === 0) return <p>No reviews available for this movie.</p>;
-    const ownsReview = reviews.find((item) => item.author_details?.id === userId);
-
+    if (reviews?.length === 0) return <p>No reviews available for this movie.</p>;
+    const ownsReview = reviews?.find((item) => item.author_details?.username === username);
     return (
         <div className="inner_content">
             {ownsReview ? <ReviewItem item={ownsReview} formatDate={formatDate} setReviews={setReviews}></ReviewItem> : <></>}
             {
-                reviews
-                    .filter((item) => item.author_details?.rating && item.author_details?.id != userId)
+                reviews?.filter((item) => item.author_details?.rating && item.author_details?.username != username)
                     .map((item) => (
                         <ReviewItem key={item.id} item={item} formatDate={formatDate} />
                     ))}

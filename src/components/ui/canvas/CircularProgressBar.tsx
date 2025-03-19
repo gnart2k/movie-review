@@ -62,7 +62,7 @@ const CircularProgressBar = ({
   return (
     <div className={"counter " + className}>
       <span className="percentage">
-        <strong>{Math.round(percentage)}<span>%</span> </strong>
+        <strong>{Math.round(percentage) || "NaN"}<span>%</span> </strong>
       </span>
       <canvas ref={canvasRef} className="circleProgressCanvas" width={widthAndHeight} height={widthAndHeight}></canvas>
     </div>

@@ -1,6 +1,8 @@
 "use client";
 import api from "@/lib/utils/axiosInstance";
+import { MovieCredits } from "@/types/movieDataAPI.types";
 import { useUser } from "@clerk/nextjs";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -21,8 +23,9 @@ interface AuthorDetails {
     rating: number | null;
 }
 
-function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp, ratingProp, setIsOpen, setReviews }: { filmId: number | undefined, isEdit?: boolean, setEdit?: Function, updateReviewHandler?: Function, contentProp?: string, ratingProp?: number, setIsOpen?: Function, setReviews?: Function }) {
-
+function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp, ratingProp, setIsOpen, setReviews, cast }: { filmId: number | undefined, isEdit?: boolean, setEdit?: Function, updateReviewHandler?: Function, contentProp?: string, ratingProp?: number, setIsOpen?: Function, setReviews?: Function, cast?: MovieCredits[]}) {
+    const pathName = usePathname();
+    console.log(pathName)
     const [content, setContent] = useState(contentProp ?? "");
     const [rating, setRating] = useState(ratingProp ?? 0);
     const { user } = useUser();
@@ -80,6 +83,27 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
         return isEdit ? updateReviewHandler?.(e, content, rating) : createReviewHandler(e)
     }
 
+    const handleGerateContent = async () => {
+        try {
+            const response = await fetch("/api/gemini", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: `paraphrase this review and make it better: ${content}`, history: [] }),
+            });
+    
+            if (!response.ok) {
+                throw new Error("Failed to generate content");
+            }
+    
+            const data = await response.text(); // Your API returns plain text
+            setContent(data); // Update the textarea with the generated content
+        } catch (error) {
+            console.error(error);
+            alert("Error generating content.");
+        }
+    };
+    
+
     return (
         <form className="my-6 w-4/5 ml-6" onSubmit={(e)=> handleSubmit(e)}>
             <div className="flex items-center mb-4">
@@ -104,14 +128,23 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
 
             <div className="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
                 <label htmlFor="comment" className="sr-only">Your comment</label>
-                <textarea id="comment" rows={6}
+                <textarea
+                    id="comment"
+                    rows={6}
                     className="px-0 w-full text-sm text-black border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800"
-                    placeholder="Write a comment..." value={content}
-                    onChange={(e) => setContent(e.target.value)} required></textarea>
+                    placeholder="Write a comment..."
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    required
+                />
             </div>
             <button type="submit"
                 className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-black bg-white rounded-lg focus:ring-4">
                 {isEdit ? "Update" : "Post Comment"}
+            </button>
+            <button type="button" onClick={()=> handleGerateContent()}
+                className="inline-flex items-center ml-4 py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-600 rounded-lg focus:ring-4">
+                {"Format Review With AI"}
             </button>
             {isEdit && <button type="button"
                 onClick={() => { setEdit?.(false); setIsOpen?.(false); }}

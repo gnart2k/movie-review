@@ -6,13 +6,14 @@ import user_icon from "@/assets/image/user_icon.png";
 import Image from "next/image";
 
 function ReviewItem({ item, formatDate, setReviews }: { item: any, formatDate: Function, setReviews?: Function }) {
-    const [review, setReview] = useState({ content: item.content, rating: item.author_details.rating ?? 0 });
     const [totalLike, setTotalLike] = useState(item.likes.length);
     const [isOpen, setIsOpen] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
     const { isSignedIn, userId } = useAuth();
     const { user } = useUser();
     const [toggleLike, setToggleLike] = useState(item.likes.find((like: any) => like.userId === userId) ? true : false);
+
+    console.log(item)
     async function toggleLikeHandler(reviewId: string) {
         if (!isSignedIn) return;
 
@@ -39,7 +40,7 @@ function ReviewItem({ item, formatDate, setReviews }: { item: any, formatDate: F
                 content,
                 rating,
             });
-            setReview({ content, rating });
+            setReviews?.((reviews: Review[]) => reviews.map((review) => review.id === item.id ? { ...review, content: content, author_details: { ...review.author_details, rating: rating } } : review));
             setIsOpen(false);
             setIsEdit(false)
         } catch (error) {
@@ -52,6 +53,7 @@ function ReviewItem({ item, formatDate, setReviews }: { item: any, formatDate: F
         try {
             await api.delete("/reviews/" + item.id);
             setReviews?.((reviews: Review[]) => reviews.filter((review) => review.id !== item.id));
+            setIsOpen(false);
         } catch (error) {
             console.error("Error deleting review:", error);
         }
@@ -79,7 +81,7 @@ function ReviewItem({ item, formatDate, setReviews }: { item: any, formatDate: F
                             </div>
                         </div>
                     </div>
-                    <CommentCard filmId={item.id} isEdit={isEdit} setEdit={setIsEdit} updateReviewHandler={updateReviewHandler} contentProp={review.content} ratingProp={review.rating} setIsOpen={setIsOpen} />
+                    <CommentCard filmId={item.id} isEdit={isEdit} setEdit={setIsEdit} updateReviewHandler={updateReviewHandler} contentProp={item.content} ratingProp={item.author_details.rating} setIsOpen={setIsOpen} />
                 </> :
                 <>
 
@@ -93,11 +95,12 @@ function ReviewItem({ item, formatDate, setReviews }: { item: any, formatDate: F
                             layout="intrinsic"
                         />
                         <div className='info'>
-                            <h3>{item.author}</h3>
+                            {/* <h3>{item.author.length == 0 || !item.author ? item.author: "Guess"}</h3> */}
+                            <h3>{item.author_details.username}</h3>
                             <div className='flex'>
-                                <div className='rounded_rating'>{review.rating + "/10"}</div>
-                                <h5>
-                                    Written by <span>{item.author_details.username}</span> on {formatDate(item.created_at)}
+                                <div className='rounded_rating'>{item.author_details.rating + "/10"}</div>
+                                <h5 className = 'text-gray-400 font-sm'>
+                                    {(<span> Written by {item.author.length == 0 ? item.author_details.username : item.author} on {formatDate(item.created_at)} </span>)}
                                 </h5>
                             </div>
                         </div>
@@ -110,7 +113,7 @@ function ReviewItem({ item, formatDate, setReviews }: { item: any, formatDate: F
                             </button>
 
                             {isOpen && (
-                                <div className="absolute top-[56px] right-0 w-44 bg-white rounded shadow-lg divide-y divide-gray-100 dark:bg-gray-700 dark:divide-gray-600">
+                                <div className="absolute top-[56px] z-50 cursor-pointer right-0 w-44 bg-white rounded shadow-lg divide-y divide-gray-100 dark:bg-gray-700 dark:divide-gray-600">
                                     <ul className="py-1 text-sm">
                                         <li>
                                             <button
@@ -165,11 +168,11 @@ function ReviewItem({ item, formatDate, setReviews }: { item: any, formatDate: F
 
                     </div>
                     <div className='text_review'>
-                        <p>{review.content}</p>
+                    <p dangerouslySetInnerHTML={{ __html: item.content }}></p>
                     </div>
                     <div className="text_review pt-2 flex content-center">
                         <span>{totalLike}</span>
-                        <button className="ml-3" onClick={() => toggleLikeHandler(item.id)}>
+                        <button type="button" className="ml-3" onClick={() => toggleLikeHandler(item.id)}>
                             {toggleLike ? "❤️" : "🤍"}
                         </button>
                     </div>

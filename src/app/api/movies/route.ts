@@ -14,9 +14,8 @@ export async function GET(req: NextRequest) {
         }
 
         // Gọi API của TMDB
-        const response = await axios.get("https://api.themoviedb.org/3/search/movie", {
+        const response = await axios.get(`https://api.themoviedb.org/3/movie/${query}`, {
             params: {
-                query,
                 api_key: process.env.TMDB_API_KEY,
             },
         });
@@ -44,7 +43,7 @@ export async function GET(req: NextRequest) {
             });
         });
 
-        return createResponse(false, "Search film by name successful", { movies }, 200);
+        return createResponse(false, "Fetch list film successful!", { movies }, 200);
     } catch (error) {
         return createResponse(false, `${error}`, { movies: [] }, 500);
     }

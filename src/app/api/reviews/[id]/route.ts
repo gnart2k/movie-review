@@ -46,7 +46,8 @@ export async function DELETE(_: NextRequest, { params }: { params: { id: string 
  */
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
     try {
-        if (!params?.id) return createResponse(false, "Review ID is required", {}, 400);
+        const { id } = await params;
+        if (!id) return createResponse(false, "Review ID is required", {}, 400);
 
         const body = await req.json();
         const parsed = updateReviewSchema.safeParse(body);
@@ -61,7 +62,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
             const updatedReview = await tx.review.update({
                 where: { id: params.id },
                 data: { content },
-                select: { id: true, authorDetailsId: true, content: true },
+                select: { authorDetailsId: true },
             });
 
             const updatedAuthorDetails = await tx.authorDetails.update({
@@ -125,8 +126,8 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
                 updated_at
             },
         },
-    
-    );
+
+        );
 
         return createResponse(true, "Review created successfully", {}, 201);
     } catch (error) {

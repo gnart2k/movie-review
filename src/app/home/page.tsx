@@ -6,10 +6,12 @@ import Slider from "@/components/layout/Slider";
 import MovieSection from "@/components/layout/MovieSection";
 
 const movieSections = [
-  { title: "Trending Movies", type: MovieSectionType.TRENDING },
-  { title: "Now Playing", type: MovieSectionType.NOW_PLAYING },
-];
+  { title: "Now Playing", type: "now_playing" },
+  { title: "Popular", type: "popular" },
+  { title: "Upcoming", type: "upcoming" },
+  { title: "Top Rate", type: "top_rated" },
 
+];
 const Home = () => {
   return (
     <div className="home">
