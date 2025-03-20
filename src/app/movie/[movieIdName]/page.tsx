@@ -12,10 +12,8 @@ import {
   fetchMovieImages,
 } from "@/lib/api/movieDataAPI";
 import Spinner from "@/components/ui/Spinner";
-import { getListReview } from "@/app/actions/review/review-action";
 
 const MovieData = async ({ movieId, movieName }: { movieId: number, movieName: string }) => {
-  console.log("MovieName:", movieName);
   const startTime = performance.now();
   try {
     const [

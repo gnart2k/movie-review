@@ -7,7 +7,7 @@ import MovieSection from "@/components/layout/MovieSection";
 
 const movieSections = [
   { title: "Now Playing", type: "now_playing" },
-  { title: "Popular", type: "popular" },
+  // { title: "Popular", type: "popular" },
   { title: "Upcoming", type: "upcoming" },
   { title: "Top Rate", type: "top_rated" },
 

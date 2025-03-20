@@ -29,7 +29,8 @@ const reviewSchema = z.object({
 /**
  * Delete a review by ID
  */
-export async function DELETE(_: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_: NextRequest, props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     try {
         if (!params?.id) return createResponse(false, "Review ID is required", {}, 400);
 
@@ -44,7 +45,8 @@ export async function DELETE(_: NextRequest, { params }: { params: { id: string 
 /**
  * Update a review (content and rating)
  */
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+    const params = await props.params;
     try {
         const { id } = await params;
         if (!id) return createResponse(false, "Review ID is required", {}, 400);
@@ -97,7 +99,6 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         if (!parsed.success) {
             return createResponse(false, parsed.error.errors[0]!.message, {}, 400);
         }
-        console.log(id);
         const { filmId, content, author, created_at, updated_at, url } = parsed.data;
 
         // if (await prisma.review.findFirst({

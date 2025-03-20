@@ -12,8 +12,6 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const { reviews, filmId } = body;
         let newReview = []
-        console.log(reviews.length)
-        console.log(filmId)
 
         for(let index = 0; index < reviews.length; index++) {
             const review = reviews[index];
@@ -37,7 +35,7 @@ export async function POST(req: NextRequest) {
                     name: author_details.name ?? author_details.username ?? "",
                     username: author_details.username ?? "",
                     avatar_path: author_details.avatar_path ? `https://image.tmdb.org/t/p/w500/${author_details.avatar_path}` : "",
-                    rating: author_details.rating,
+                    rating: author_details.rating ?? 0,
                 },
             });
 

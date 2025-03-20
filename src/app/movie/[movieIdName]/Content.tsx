@@ -62,7 +62,6 @@ function Content(props: ContentProps) {
 
   const cast = props.credits?.cast ?? [];
   const cast_slice = cast.slice(0, 9);
-  // console.log("Cast slice: ", cast_slice);
   const images = props.images?.backdrops ?? [];
   const image_slice = images.slice(0, 15);
   return (

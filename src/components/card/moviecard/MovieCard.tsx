@@ -48,21 +48,21 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, isLoading }) => {
           <Image
             src={`${IMG_PATH}${movie.poster_path}`}
             alt={movie.title}
-            width={200}
-            height={300}
-            style={{opacity: isImageLoaded ? 1 : 0 }}
+            width={120}
+            height={180}
+            style={{opacity: isImageLoaded ? 1 : 0, height: '180px' }}
             loading="lazy"
             onLoad={() => setIsImageLoaded(true)}
           />
         </div>
-        {isImageLoaded && (
+        {/* {movie.vote_average ? (
           <CircularProgressBar
             className="bar"
             percentage={movie.vote_average * 10}
             color={getColorByRating(movie.vote_average)}
             widthAndHeight={36}
           />
-        )}
+        ) : <></>} */}
         <div className="movie-info" style={{ opacity: isImageLoaded ? 1 : 0 }}>
           <h3>{movie.title}</h3>
         </div>

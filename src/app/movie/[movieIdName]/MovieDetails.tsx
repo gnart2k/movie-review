@@ -77,7 +77,7 @@ function MovieDetail({
   const [leadPeoples, setLeadPeoples] = useState<LeadPeopleType[]>([]);
 
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [averageRating, setAverageRating] = useState<number>(0);  
+  const [averageRating, setAverageRating] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const { user } = useUser();
 
@@ -120,14 +120,14 @@ function MovieDetail({
   }, [movieDetails?.id, movieReviews]);
 
   useEffect(() => {
-    if (reviews) { 
+    if (reviews) {
       const toltalRating = reviews.reduce((accumulator, currentValue) => {
         return currentValue.author_details.rating ? accumulator + currentValue.author_details.rating : accumulator;
       }, 0);
-      setAverageRating(toltalRating/reviews.length);
+      setAverageRating(toltalRating / reviews.length);
     }
-  },[reviews]);
-  
+  }, [reviews]);
+
   useEffect(() => {
     const bg_wrapper = refBG.current?.style;
     const url = "https://image.tmdb.org/t/p/w780/";
@@ -192,7 +192,6 @@ function MovieDetail({
         }
       });
       const mergedCrewList = Object.values(mergedCrew);
-      //? console.log(mergedCrewList);
       //! Sort the mergedCrewList based on job role order
       mergedCrewList.sort((a, b) => {
         const indexA = jobRoleOrder.indexOf(a.jobs[0] ?? "");
@@ -337,7 +336,7 @@ const PosterHeader: React.FC<PosterHeaderProps> = ({
         </section>
         <nav className="action">
           <ul>
-            <li className="flex rating">
+            {averageRating ? <li className="flex rating">
               <div className="w-[68px] h-[68px]">
                 <CircularProgressBar
                   percentage={Math.floor(averageRating * 10)}
@@ -354,7 +353,7 @@ const PosterHeader: React.FC<PosterHeaderProps> = ({
                   "User Score"
                 )}
               </div>
-            </li>
+            </li> : <></>}
             <li className="trailer">
               <ModalVideo
                 channel="youtube"

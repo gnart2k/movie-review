@@ -5,7 +5,6 @@ import { NextResponse } from "next/server"; // Use NextResponse for Next.js API 
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        console.log(body);
 
         if (!process.env.GEMINI_API_KEY) {
             return NextResponse.json({ error: "Missing Google API Key" }, { status: 500 });

@@ -18,7 +18,7 @@ function ReviewCard({ reviews, username, setReviews }: { filmId?: number, review
         <div className="inner_content">
             {ownsReview ? <ReviewItem item={ownsReview} formatDate={formatDate} setReviews={setReviews}></ReviewItem> : <></>}
             {
-                reviews?.filter((item) => item.author_details?.rating && item.author_details?.username != username)
+                reviews?.filter((item) => item.author_details?.username != username)
                     .map((item) => (
                         <ReviewItem key={item.id} item={item} formatDate={formatDate} />
                     ))}
