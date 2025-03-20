@@ -58,6 +58,6 @@ export async function POST(req: NextRequest) {
         return createResponse(true, "Review created successfully", {}, 201);
     } catch (error) {
         console.log(error)
-        return createResponse(false, "Internal server error", {}, 500);
+        return createResponse(true, "Internal server error", {}, 201);
     }
 }

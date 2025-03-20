@@ -9,7 +9,7 @@ interface SearchBarProps {
 }
 
 export default function SearchBar({ onSubmit }: SearchBarProps) {
-  const [isFocused, setIsFocused] = useState(false)
+  const [isFocused, setIsFocused] = useState(true)
   const [searchValue, setSearchValue] = useState("")
   const formRef = useRef<HTMLFormElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -19,6 +19,7 @@ export default function SearchBar({ onSubmit }: SearchBarProps) {
     if (isFocused) {
       onSubmit(searchValue)
     }
+    setSearchValue('');
   }
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -34,7 +35,7 @@ export default function SearchBar({ onSubmit }: SearchBarProps) {
   }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className={`search-wrapper ${isFocused ? 'focused' : ''}`} onClick={handleClick}>
+    <form ref={formRef} onSubmit={handleSubmit} className={`search-wrapper ${isFocused ? 'focused' : ''}`}>
       <input
         ref={inputRef}
         autoComplete="off"
@@ -43,8 +44,8 @@ export default function SearchBar({ onSubmit }: SearchBarProps) {
         placeholder="Search 'Avatar 2'"
         value={searchValue}
         onChange={handleChange}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
+        // onFocus={() => setIsFocused(true)}
+        // onBlur={() => setIsFocused(false)}
       />
 
       <button type="submit" className="search-button" aria-label="Search">

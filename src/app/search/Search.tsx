@@ -21,13 +21,20 @@ const Search = ({ query }: { query: string }) => {
     const fetchData = async () => {
       setIsLoading(true);
       const res = await api.get(`/search?query=${query}`);
-      console.log(res.data.data.movies);
       setMovieData(res.data.data.movies);
       setIsLoading(false);
     };
 
     void fetchData();
   }, [query]);
+
+  if (movieData.length == 0) {
+    return <div className="search-movies">
+      <h2> No Search Results for &quot;
+        <span className="text-purple-400">{query}</span>&quot;. Try to searching another film
+      </h2>
+    </div>
+  }
 
   return (
     <div className="search-movies">
