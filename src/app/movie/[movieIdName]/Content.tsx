@@ -21,8 +21,7 @@ import twitterx_icon from "@/assets/image/twitterx_icon.png";
 import instagram_icon from "@/assets/image/instagram_icon.png";
 import link_icon from "@/assets/image/link_icon.png";
 import CommentCard from "@/components/card/comment-card/CommentCard";
-import api from "@/lib/utils/axiosInstance";
-import { useUser } from "@clerk/nextjs";
+import Link from "next/link";
 
 //Abbriviation Map
 const abbreviationMap = LanguageAbbrevations();
@@ -210,7 +209,9 @@ function Content(props: ContentProps) {
             {props.keywords?.map((item, index) => {
               return (
                 <li key={index} data-keyword-id={item.id}>
+                  <Link href={`/search?with_keywords=${item.id}`}>
                   {item.name}
+                  </Link>
                 </li>
               );
             })}

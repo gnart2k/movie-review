@@ -317,13 +317,15 @@ const PosterHeader: React.FC<PosterHeaderProps> = ({
         <section className="ott_title">
           <h1 className="title">
             <span className="name">{movieDetails.title || "Title"}</span>
-            <span className="tag release_date">{`(${releaseDate?.year})`}</span>
+            <span className="tag release_date">{releaseDate?.year ? `(${releaseDate?.year})` : <></>}</span>
           </h1>
           <div className="facts">
             <span className="certification">{certification || "Certification"}</span>
-            <time className="release" dateTime={`${releaseDate?.year}-${releaseDate?.month}-${releaseDate?.day}`}>
-              {`${releaseDate?.day}/${releaseDate?.month}/${releaseDate?.year} (${releaseDate?.country})`}
-            </time>
+            {releaseDate ?
+              <time className="release" dateTime={`${releaseDate?.year}-${releaseDate?.month}-${releaseDate?.day}`}>
+                {`${releaseDate?.day}/${releaseDate?.month}/${releaseDate?.year} (${releaseDate?.country})`}
+              </time> : <></>
+            }
             <span className="genres">
               {movieDetails.genres.map((item, index) => (
                 <span key={item.id} data-genre_id={item.id}>

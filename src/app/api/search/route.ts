@@ -8,18 +8,28 @@ export async function GET(req: NextRequest) {
         // Lấy query từ request URL
         const { searchParams } = new URL(req.url);
         const query = searchParams.get("query");
-
-        if (!query) {
-            return createResponse(false, "Missing query parameter", { movies: [] }, 400);
+        const withKeywords = searchParams.get("with_keywords");
+        
+        
+        let response;
+        if (query) {
+            response = await axios.get("https://api.themoviedb.org/3/search/movie", {
+                params: {
+                    query,
+                    year: new Date().getFullYear(),
+                    api_key: process.env.TMDB_API_KEY,
+                },
+            });
+        } else {
+            response = await axios.get("https://api.themoviedb.org/3/discover/movie", {
+                params: {
+                    with_keywords: withKeywords,
+                    year: new Date().getFullYear(),
+                    api_key: process.env.TMDB_API_KEY,
+                },
+            });
         }
-
         // Gọi API của TMDB
-        const response = await axios.get("https://api.themoviedb.org/3/search/movie", {
-            params: {
-                query,
-                api_key: process.env.TMDB_API_KEY,
-            },
-        });
         const movies: Movie[] = [];
 
         const rawMovies: Array<any> = response.data.results;

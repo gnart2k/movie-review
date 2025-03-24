@@ -12,22 +12,24 @@ function ReviewItem({ item, formatDate, setReviews }: { item: any, formatDate: F
     const { isSignedIn, userId } = useAuth();
     const { user } = useUser();
     const [toggleLike, setToggleLike] = useState(item.likes.find((like: any) => like.userId === userId) ? true : false);
+    const [isLoading, setIsLoading] = useState(false);
 
-    console.log(item)
     async function toggleLikeHandler(reviewId: string) {
         if (!isSignedIn) return;
 
         try {
+ setIsLoading(true);
             await api.post("/reviews/like", {
                 userId,
                 reviewId,
             });
-            const res = await api.get(`reviews/like?reviewId=${reviewId}`)
+            const res = await api.get(`reviews/like?reviewId=${reviewId}`);
             setToggleLike(prev => !prev)
-            console.log(res.data.data.likeCount);
             setTotalLike(res.data.data.likeCount);
         } catch (error) {
             console.error("Error toggling like:", error);
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -172,8 +174,8 @@ function ReviewItem({ item, formatDate, setReviews }: { item: any, formatDate: F
                     </div>
                     <div className="text_review pt-2 flex content-center">
                         <span>{totalLike}</span>
-                        <button type="button" className="ml-3" onClick={() => toggleLikeHandler(item.id)}>
-                            {toggleLike ? "❤️" : "🤍"}
+                        <button type="button" disabled={isLoading} className="ml-3" onClick={() => toggleLikeHandler(item.id)}>
+                            {isLoading ? "Processing..." : toggleLike ? "❤️" : "🤍"}
                         </button>
                     </div>
                 </>
