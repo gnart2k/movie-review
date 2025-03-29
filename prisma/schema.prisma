@@ -46,3 +46,17 @@ model ReviewLike {
 
   @@unique([userId, reviewId])
 }
+
+model AIReview {
+  id        Int      @id @default(autoincrement())
+  filmId    Int
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model UserCategoryStats {
+  id         Int    @id @default(autoincrement())
+  userId     String
+  categoryId Int
+  count      Int    @default(1)
+}

@@ -4,6 +4,7 @@ import CommentCard from "../comment-card/CommentCard";
 import api from "@/lib/utils/axiosInstance";
 import user_icon from "@/assets/image/user_icon.png";
 import Image from "next/image";
+import SpeechComponent from "@/components/SpeechComponent";
 
 function ReviewItem({ item, formatDate, setReviews }: { item: any, formatDate: Function, setReviews?: Function }) {
     const [totalLike, setTotalLike] = useState(item.likes.length);
@@ -169,6 +170,7 @@ function ReviewItem({ item, formatDate, setReviews }: { item: any, formatDate: F
                         </div>}
 
                     </div>
+                    <SpeechComponent text={item.content}/>
                     <div className='text_review'>
                     <p dangerouslySetInnerHTML={{ __html: item.content }}></p>
                     </div>

@@ -32,7 +32,7 @@ const SpeechComponent = dynamic(() =>
           const availableVoices = synth.getVoices();
           setVoices(availableVoices);
           if (availableVoices.length > 0) {
-            setSelectedVoice(availableVoices[0].name);
+            availableVoices[0] && setSelectedVoice(availableVoices[0].name);
           }
         };
 
@@ -59,6 +59,14 @@ const SpeechComponent = dynamic(() =>
         synth.speak(utterance);
       };
 
+      const handleStop = () => {
+        // stop(); // We are not using the hook's stop function as per the requirement
+        const synth = window.speechSynthesis;
+        synth.cancel(); // This will immediately stop any currently speaking utterance
+        // Optionally, you can reset the progress bar here if needed
+        // setProgress(0);
+      };
+
       const toggleSettings = () => {
         setShowSettings(!showSettings);
       };
@@ -70,39 +78,39 @@ const SpeechComponent = dynamic(() =>
             {/* Controls Section */}
             <div className="flex items-center space-x-4 mb-4">
               {speechStatus !== "started" ? (
-                <button
+                <div
                   className=" text-white font-bold rounded-full w-12 h-12 flex items-center justify-center focus:outline-none"
                   onClick={handlePlay}
                 >
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
                   </svg>
-                </button>
+                </div>
               ) : (
-                <button
+                <div
                   className="font-bold rounded-full w-12 h-12 flex items-center justify-center focus:outline-none"
-                  onClick={pause}
+                  onClick={handleStop}
                 >
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
-                </button>
+                </div>
               )}
-              <button
+              <div
                 className="text-white font-bold rounded-full w-12 h-12 flex items-center justify-center focus:outline-none"
-                onClick={stop}
+                onClick={handleStop}
               >
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1zm4 0a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
                 </svg>
-              </button>
+              </div>
             </div>
           </div>
 
           {/* Right Section: Settings */}
           <div className="flex flex-col justify-between">
-            {/* Toggle Settings Button */}
-            <button
+            {/* Toggle Settings div */}
+            <div
               onClick={toggleSettings}
               className="hover:bg-gray-700 text-white rounded-md p-2 mt-2 focus:outline-none"
             >
@@ -120,7 +128,7 @@ const SpeechComponent = dynamic(() =>
                   d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
                 />
               </svg>
-            </button>
+            </div>
 
             {showSettings && (
               <div className="space-y-4">
@@ -233,6 +241,4 @@ const SpeechComponent = dynamic(() =>
   { ssr: false }
 );
 
-export default function App() {
-  return <SpeechComponent text="This library is awesome!" />;
-}
+export default SpeechComponent

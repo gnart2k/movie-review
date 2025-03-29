@@ -1,10 +1,13 @@
 "use client";
+import SpeechComponent from "@/components/SpeechComponent";
 import api from "@/lib/utils/axiosInstance";
 import { MovieCredits } from "@/types/movieDataAPI.types";
 import { useUser } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import Markdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 interface Review {
     author: string;
@@ -23,10 +26,10 @@ interface AuthorDetails {
     rating: number | null;
 }
 
-function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp, ratingProp, setIsOpen, setReviews, cast }: { filmId: number | undefined, isEdit?: boolean, setEdit?: Function, updateReviewHandler?: Function, contentProp?: string, ratingProp?: number, setIsOpen?: Function, setReviews?: Function, cast?: MovieCredits[]}) {
+function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp, ratingProp, setIsOpen, setReviews, cast }: { filmId: number | undefined, isEdit?: boolean, setEdit?: Function, updateReviewHandler?: Function, contentProp?: string, ratingProp?: number, setIsOpen?: Function, setReviews?: Function, cast?: MovieCredits[] }) {
     const pathName = usePathname();
-    console.log(pathName)
     const [content, setContent] = useState(contentProp ?? "");
+    const [aicontent, setAiContent] = useState(contentProp ?? "");
     const [rating, setRating] = useState(ratingProp ?? 0);
     const { user } = useUser();
 
@@ -74,13 +77,41 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
         }
     }
 
-    const handleSubmit = (e:any)=>{
-        if(!user){
+    const handleSubmit = (e: any) => {
+        if (!user) {
             toast.error("Please login to review film")
             return
         }
         //@ts-ignore
         return isEdit ? updateReviewHandler?.(e, content, rating) : createReviewHandler(e)
+    }
+
+    const handleAISummaryContent = async () => {
+        try {
+            const movieNameArray = pathName.split('/')
+            if (movieNameArray.length == 0) {
+                return
+            }
+            const movieNameSplitted = pathName.split('/')[2]?.split('-').slice(1).join(' ')
+
+            const prompt = `in-depth review of the movie ${movieNameSplitted} including critic reviews from major publications (e.g., New York Times, Variety, Hollywood Reporter), user reviews and ratings from platforms like IMDb, Rotten Tomatoes (including Tomatometer and Audience Score), and Metacritic (Metascore and user score). Include analysis of the plot, acting performances, directing, cinematography, soundtrack, and overall themes. Search for both positive and negative reviews to get a balanced perspective. Also look for spoiler-free reviews if possible.`
+
+            const response = await fetch("/api/gemini", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: prompt, history: [] }),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to generate content");
+            }
+
+            const data = await response.text(); // Your API returns plain text
+            setAiContent(data); // Update the textarea with the generated content
+        } catch (error) {
+            console.error(error);
+            alert("Error generating content.");
+        }
     }
 
     const handleGerateContent = async () => {
@@ -90,11 +121,11 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ message: `paraphrase this review and make it better: ${content}`, history: [] }),
             });
-    
+
             if (!response.ok) {
                 throw new Error("Failed to generate content");
             }
-    
+
             const data = await response.text(); // Your API returns plain text
             setContent(data); // Update the textarea with the generated content
         } catch (error) {
@@ -102,10 +133,22 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
             alert("Error generating content.");
         }
     };
-    
+
 
     return (
-        <form className="my-6 w-4/5 ml-6" onSubmit={(e)=> handleSubmit(e)}>
+        <form className="my-6 w-4/5 ml-6" onSubmit={(e) => handleSubmit(e)}>
+            {aicontent && <div className="relative p-8 bg-gradient-to-r from-gray-800 to-gray-700 rounded-lg shadow-md overflow-hidden mb-8">
+                <div className="absolute inset-0 bg-black opacity-10 mix-blend-multiply pointer-events-none" />
+                <div className="absolute inset-0 bg-no-repeat bg-center opacity-10 mix-blend-multiply pointer-events-none" />
+                <div className="relative z-10 text-white" />
+                <span className="flex items-center border rounded-lg bg-dark/10 justify-start p-4 mb-2 w-80">
+                    <svg className="w-4 h-4 mr-2" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M16 8.016A8.522 8.522 0 008.016 16h-.032A8.521 8.521 0 000 8.016v-.032A8.521 8.521 0 007.984 0h.032A8.522 8.522 0 0016 7.984v.032z" fill="url(#prefix__paint0_radial_980_20147)" /><defs><radialGradient id="prefix__paint0_radial_980_20147" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(16.1326 5.4553 -43.70045 129.2322 1.588 6.503)"><stop offset=".067" stopColor="#9168C0" /><stop offset=".343" stopColor="#5684D1" /><stop offset=".672" stopColor="#1BA1E3" /></radialGradient></defs></svg>
+                    <p className=" text-sm font-semibold">This content was generated with AI</p>
+                </span>
+                <Markdown remarkPlugins={[remarkGfm]}>{aicontent}</Markdown>
+                <SpeechComponent text={aicontent}/>
+            </div>
+            }
             <div className="flex items-center mb-4">
                 <span className="flex flex-row-reverse">
                     <svg className={"w-4 h-4 ms-1 cursor-pointer peer peer-hover:text-yellow-300 hover:text-yellow-300 duration-100" + (rating >= 10 ? " text-yellow-300" : "text-gray-300")} onClick={() => setRating(10)} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
@@ -142,9 +185,14 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
                 className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-black bg-white rounded-lg focus:ring-4">
                 {isEdit ? "Update" : "Post Comment"}
             </button>
-            <button type="button" onClick={()=> handleGerateContent()}
+            <button type="button" onClick={() => handleGerateContent()}
                 className="inline-flex items-center ml-4 py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-600 rounded-lg focus:ring-4">
                 {"Format Review With AI"}
+            </button>
+
+            <button type="button" onClick={() => handleAISummaryContent()}
+                className="inline-flex items-center ml-4 py-2.5 px-4 text-xs font-medium text-center text-white bg-orange-600 rounded-lg focus:ring-4">
+                {"Summary Review With AI"}
             </button>
             {isEdit && <button type="button"
                 onClick={() => { setEdit?.(false); setIsOpen?.(false); }}

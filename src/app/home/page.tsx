@@ -6,8 +6,8 @@ import Slider from "@/components/layout/Slider";
 import MovieSection from "@/components/layout/MovieSection";
 
 const movieSections = [
+  { title: "Maybe You Like", type: "maybe_you_like" },
   { title: "Now Playing", type: "now_playing" },
-  // { title: "Popular", type: "popular" },
   { title: "Upcoming", type: "upcoming" },
   { title: "Top Rate", type: "top_rated" },
 

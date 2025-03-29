@@ -9,6 +9,7 @@ import api from "@/lib/utils/axiosInstance";
 const MovieCard = React.lazy(() => import("@/components/card/moviecard/MovieCard"));
 
 export enum MovieSectionType {
+  MAYBE_YOU_LIKE = "maybe_you_like",
   TRENDING = "trending",
   NOW_PLAYING = "now_playing",
   POPULAR = "popular",
@@ -28,7 +29,13 @@ const MovieSection: React.FC<MovieSectionProps> = ({ title, type }) => {
     const fetchMovies = async () => {
       try {
         setIsLoading(true);
-        const response = await api.get(`/movies?query=${type}`);
+        let response;
+        
+        if (type === MovieSectionType.MAYBE_YOU_LIKE)
+          response = await api.get(`/search?with_keywords=${12}`);
+        else
+          response = await api.get(`/movies?query=${type}`);
+
         if (response) setMovieData(response.data.data.movies);
       } catch (error) {
         if (error instanceof Error) {
@@ -40,7 +47,7 @@ const MovieSection: React.FC<MovieSectionProps> = ({ title, type }) => {
     };
     void fetchMovies();
   }, [type]);
-  
+
   return (
     <div className="movie-section">
       <h2 style={{ opacity: isLoading ? 0 : 1 }}>{title}</h2>
