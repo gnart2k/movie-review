@@ -59,4 +59,6 @@ model UserCategoryStats {
   userId     String
   categoryId Int
   count      Int    @default(1)
+
+  @@unique([userId, categoryId])
 }

@@ -9,5 +9,7 @@ export async function POST(req: NextRequest) {
         let newReview = []
 
         
+    }catch(e){
+        console.error(e)
     }
 }

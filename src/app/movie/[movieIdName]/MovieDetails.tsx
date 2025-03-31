@@ -81,7 +81,9 @@ function MovieDetail({
   const [loading, setLoading] = useState(true);
   const { user } = useUser();
 
+  // Insert and fetch reviews into database
   useEffect(() => {
+    //Fetch reviews from database
     const fetchReviews = async () => {
       if (!movieDetails?.id) {
         setLoading(false);
@@ -91,7 +93,6 @@ function MovieDetail({
       try {
         const response = await api.get(`/reviews?filmId=${movieDetails?.id}`);
         setReviews(response.data.data ?? []);
-        console.log("Fetched reviews:", response.data);
       } catch (error) {
         console.error("Error fetching reviews:", error);
       } finally {
@@ -99,6 +100,7 @@ function MovieDetail({
       }
     };
 
+    // Insert reviews from moviedb to database
     const insertReviews = async () => {
       if (!movieReviews || movieReviews.length === 0) return;
       try {
@@ -112,13 +114,34 @@ function MovieDetail({
       }
     };
 
+    // Insert reviews from moviedb to database
+    const statsFavorite = async () => {
+      if (!movieReviews || movieReviews.length === 0) return;
+      if (!movieKeywords || movieKeywords.length === 0) return;
+      if (!user) return;
+      const keywords = movieKeywords.map((keyword) => keyword.id);
+      
+      try {
+
+        await api.post("/movies/stats",
+          { keywords, userId: user.id });
+        console.log("Statistic personal preference successful!");
+      } catch (error) {
+        console.error("Error statistic personal preference:", error);
+      } finally {
+        fetchReviews();
+      }
+    };
+
     fetchReviews();
 
     if (movieReviews && movieReviews.length > 0) {
       insertReviews();
+      if (user) statsFavorite();
     }
   }, [movieDetails?.id, movieReviews]);
 
+  //Caculate rating score
   useEffect(() => {
     if (reviews) {
       const toltalRating = reviews.reduce((accumulator, currentValue) => {
@@ -127,6 +150,8 @@ function MovieDetail({
       setAverageRating(toltalRating / reviews.length);
     }
   }, [reviews]);
+
+
 
   useEffect(() => {
     const bg_wrapper = refBG.current?.style;

@@ -4,15 +4,15 @@ import "@/styles/pages/Home.scss";
 
 import Slider from "@/components/layout/Slider";
 import MovieSection from "@/components/layout/MovieSection";
+import {getAuth } from "@clerk/nextjs/server";
 
 const movieSections = [
   { title: "Maybe You Like", type: "maybe_you_like" },
   { title: "Now Playing", type: "now_playing" },
   { title: "Upcoming", type: "upcoming" },
   { title: "Top Rate", type: "top_rated" },
-
 ];
-const Home = () => {
+const Home = async () => {
   return (
     <div className="home">
       <Suspense fallback={<div>Loading Slider...</div>}>
@@ -21,7 +21,7 @@ const Home = () => {
       <Suspense fallback={<div>Loading movies...</div>}>
         <div className="movie-container">
           {movieSections.map((section, index) => (
-            <MovieSection key={index} title={section.title} type={section.type} />
+            <MovieSection key={index} title={section.title} type={section.type}/>
           ))}
         </div>
       </Suspense>
