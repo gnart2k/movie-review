@@ -45,13 +45,11 @@ export async function GET(req: NextRequest) {
     try {
         const userId = String(req.nextUrl.searchParams.get("userId"));
         if (!userId) return createResponse(false, "User ID is required", {}, 400);
-        console.log(userId);
         const categoryId = await prisma.userCategoryStats.findFirst({
             where: { userId },
             orderBy: { count: "desc" },
             select: { categoryId: true },
         });
-        console.log(categoryId);
         return createResponse(true, "Reviews fetched successfully", categoryId);
     } catch (error) {
         console.error(error);

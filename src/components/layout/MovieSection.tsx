@@ -28,7 +28,6 @@ const MovieSection: React.FC<MovieSectionProps> = ({ title, type }) => {
   const [movieData, setMovieData] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { userId } = useAuth();
-  console.log(userId);
   useEffect(() => {
     const fetchMovies = async () => {
       try {
@@ -37,7 +36,8 @@ const MovieSection: React.FC<MovieSectionProps> = ({ title, type }) => {
         if (type === MovieSectionType.MAYBE_YOU_LIKE) {
           if (!userId) return
           const result = await api.get(`/movies/stats?userId=${userId}`);
-          const categoryId = result.data.data.categoryId;
+          const categoryId = result.data.data?.categoryId;
+          if(!categoryId) return
           response = await api.get(`/search?with_keywords=${categoryId}`);
         }
         else
@@ -54,7 +54,10 @@ const MovieSection: React.FC<MovieSectionProps> = ({ title, type }) => {
     };
     void fetchMovies();
   }, [type, userId]);
+
   if(userId === null && type === MovieSectionType.MAYBE_YOU_LIKE) return (<></>)
+
+  if(movieData.length === 0) return (<></>);
 
   return (
     <div className="movie-section">

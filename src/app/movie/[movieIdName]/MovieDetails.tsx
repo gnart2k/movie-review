@@ -120,7 +120,7 @@ function MovieDetail({
       if (!movieKeywords || movieKeywords.length === 0) return;
       if (!user) return;
       const keywords = movieKeywords.map((keyword) => keyword.id);
-      
+
       try {
 
         await api.post("/movies/stats",
@@ -381,7 +381,7 @@ const PosterHeader: React.FC<PosterHeaderProps> = ({
                 )}
               </div>
             </li> : <></>}
-            <li className="trailer">
+            {movieVideo && <li className="trailer">
               <ModalVideo
                 channel="youtube"
                 isOpen={isOpen}
@@ -395,7 +395,7 @@ const PosterHeader: React.FC<PosterHeaderProps> = ({
               <button onClick={() => setOpen(true)}>
                 <span className="playIcon"></span>Play Trailer
               </button>
-            </li>
+            </li>}
           </ul>
         </nav>
         <section className="header_info">
