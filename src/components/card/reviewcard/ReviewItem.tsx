@@ -5,8 +5,9 @@ import api from "@/lib/utils/axiosInstance";
 import user_icon from "@/assets/image/user_icon.png";
 import Image from "next/image";
 import SpeechComponent from "@/components/SpeechComponent";
+import toast from "react-hot-toast";
 
-function ReviewItem({ item, formatDate, setReviews }: { item: any, formatDate: Function, setReviews?: Function }) {
+function ReviewItem({ item, formatDate, setReviews, index}: { item: any, formatDate: Function, setReviews?: Function, index: number}) {
     const [totalLike, setTotalLike] = useState(item.likes.length);
     const [isOpen, setIsOpen] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
@@ -16,8 +17,10 @@ function ReviewItem({ item, formatDate, setReviews }: { item: any, formatDate: F
     const [isLoading, setIsLoading] = useState(false);
 
     async function toggleLikeHandler(reviewId: string) {
-        if (!isSignedIn) return;
-
+        if (!isSignedIn) {
+            toast.error("Please sign in to like this review")
+            return;
+        }
         try {
  setIsLoading(true);
             await api.post("/reviews/like", {
@@ -170,7 +173,7 @@ function ReviewItem({ item, formatDate, setReviews }: { item: any, formatDate: F
                         </div>}
 
                     </div>
-                    <SpeechComponent text={item.content}/>
+                    <SpeechComponent text={item.content} ttsIndex={index}/>
                     <div className='text_review'>
                     <p dangerouslySetInnerHTML={{ __html: item.content }}></p>
                     </div>

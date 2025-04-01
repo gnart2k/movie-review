@@ -16,11 +16,11 @@ function ReviewCard({ reviews, username, setReviews }: { filmId?: number, review
     const ownsReview = reviews?.find((item) => item.author_details?.username === username);
     return (
         <div className="inner_content">
-            {ownsReview ? <ReviewItem item={ownsReview} formatDate={formatDate} setReviews={setReviews}></ReviewItem> : <></>}
+            {ownsReview ? <ReviewItem index={100} item={ownsReview} formatDate={formatDate} setReviews={setReviews}></ReviewItem> : <></>}
             {
                 reviews?.filter((item) => item.author_details?.username != username)
-                    .map((item) => (
-                        <ReviewItem key={item.id} item={item} formatDate={formatDate} />
+                    .map((item, index) => (
+                        <ReviewItem key={item.id} item={item} formatDate={formatDate} index={index} />
                     ))}
         </div>
     );

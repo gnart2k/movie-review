@@ -146,7 +146,7 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
                     <p className=" text-sm font-semibold">This content was generated with AI</p>
                 </span>
                 <Markdown remarkPlugins={[remarkGfm]}>{aicontent}</Markdown>
-                <SpeechComponent text={aicontent}/>
+                <SpeechComponent text={aicontent} ttsIndex={99}/>
             </div>
             }
             <div className="flex items-center mb-4">

@@ -3,10 +3,11 @@
 import dynamic from "next/dynamic";
 import React, { useState, useEffect } from "react";
 import {CirclePause, Play} from "lucide-react"
+import { useTTSStore } from "@/app/store/TTSStore";
 
 const SpeechComponent = dynamic(() =>
   import("react-text-to-speech").then((mod) => {
-    return function WrappedComponent({ text }: { text: string }) {
+    return function WrappedComponent({ text, ttsIndex}: { text: string, ttsIndex: number}) {
       const {
         Text,
         speechStatus,
@@ -20,7 +21,9 @@ const SpeechComponent = dynamic(() =>
       const [rate, setRate] = useState<number>(1);
       const [volume, setVolume] = useState<number>(1);
       const [showSettings, setShowSettings] = useState<boolean>(false);
-      const [isPlay, setIsPlay] = useState<boolean>(false)
+      const isPlay = useTTSStore(state => state.items[ttsIndex]?.isPlaying)
+      const setPlay = useTTSStore(state => state.setPlay)
+      const setStop = useTTSStore(state => state.setStop)
 
       // Load danh sách giọng đọc
       useEffect(() => {
@@ -43,8 +46,9 @@ const SpeechComponent = dynamic(() =>
       };
 
       const handlePlay = () => {
+        console.log('play')
         handleStop();
-        setIsPlay(true)
+        setPlay(ttsIndex)
         const synth = window.speechSynthesis;
         const utterance = new SpeechSynthesisUtterance(text);
         const selected = voices.find((voice) => voice.name === selectedVoice);
@@ -54,11 +58,14 @@ const SpeechComponent = dynamic(() =>
         utterance.rate = rate;
         utterance.volume = volume;
         synth.speak(utterance);
+        utterance.onend = () => {
+          setStop(ttsIndex);
+        };
       };
 
       const handleStop = () => {
         const synth = window.speechSynthesis;
-        setIsPlay(false)
+        setStop(ttsIndex)
         synth.cancel();
       };
 
@@ -67,7 +74,7 @@ const SpeechComponent = dynamic(() =>
           {/* Left Section: Controls and Progress */}
           <div className="flex flex-col items-center mr-6 mt-2">
             {/* Controls Section */}
-            <div className="flex items-center space-x-4 mb-4 mt-2">
+            <div className="flex items-center space-x-4 mb-4 mt-2 cursor-pointer">
               {!isPlay ? (
                 <div
                   className=" text-white font-bold rounded-full w-12 h-12 flex items-center justify-center focus:outline-none"

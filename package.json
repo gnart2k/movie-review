@@ -43,7 +43,8 @@
     "sass": "^1.78.0",
     "sharp": "^0.33.5",
     "web-vitals": "^3.4.0",
-    "zod": "^3.23.3"
+    "zod": "^3.23.3",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@types/eslint": "^8.56.10",
