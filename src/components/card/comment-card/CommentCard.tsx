@@ -8,6 +8,8 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { RedirectToSignIn } from "@clerk/nextjs";
+
 
 interface Review {
     author: string;
@@ -35,7 +37,10 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
 
     async function createReviewHandler(event: React.FormEvent) {
         event.preventDefault();
-        if (!user) return;
+        if (!user) {
+            toast.error("Please login to review film")
+            return <RedirectToSignIn/>
+        }
 
         try {
             const response = await api.post("/reviews", {
@@ -46,7 +51,7 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
                     name: user.fullName ?? "",
                     username: user.primaryEmailAddress?.toString() ?? "",
                     avatar_path: user.imageUrl,
-                    rating: rating,
+                    rating: rating === 0 ? 10 : rating,
                 },
             });
 
@@ -58,7 +63,7 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
                         name: reviewCreated.author,
                         username: user.primaryEmailAddress?.toString() ?? "",
                         avatar_path: user.imageUrl,
-                        rating: rating,
+                        rating: rating === 0 ? 10 : rating,
                     },
                     content: reviewCreated.content,
                     created_at: reviewCreated.created_at,
@@ -80,7 +85,7 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
     const handleSubmit = (e: any) => {
         if (!user) {
             toast.error("Please login to review film")
-            return
+            return <RedirectToSignIn/>
         }
         //@ts-ignore
         return isEdit ? updateReviewHandler?.(e, content, rating) : createReviewHandler(e)
@@ -178,7 +183,6 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
                     placeholder="Write a comment..."
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
-                    required
                 />
             </div>
             <button type="submit"

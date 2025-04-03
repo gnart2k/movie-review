@@ -6,7 +6,7 @@ import { z } from "zod"; // Thư viện kiểm tra dữ liệu đầu vào
 // Schema kiểm tra dữ liệu đầu vào của review
 const reviewSchema = z.object({
     filmId: z.number().positive("Invalid film ID"),
-    content: z.string().min(1, "Content is required"),
+    content: z.string().optional(),
     author: z.object({
         id: z.string().min(1, "Author ID is required"),
         name: z.string().optional(),
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
         const review = await prisma.review.create({
             data: {
                 filmId,
-                content,
+                content: content ?? "",
                 author: author.name ?? "",
                 url: "",
                 authorDetailsId: authorDetails.id,

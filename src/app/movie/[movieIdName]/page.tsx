@@ -12,8 +12,9 @@ import {
   fetchMovieImages,
 } from "@/lib/api/movieDataAPI";
 import Spinner from "@/components/ui/Spinner";
+import { auth } from "@clerk/nextjs/server";
 
-const MovieData = async ({ movieId, movieName }: { movieId: number, movieName: string }) => {
+const MovieData = async ({ movieId, movieName, redirectToSignIn }: { movieId: number, movieName: string, redirectToSignIn: Function }) => {
   const startTime = performance.now();
   try {
     const [
@@ -63,6 +64,7 @@ const MovieData = async ({ movieId, movieName }: { movieId: number, movieName: s
 
 const Page = async ({ params }: { params: { movieIdName: string } }) => {
   const { movieIdName } = await params;
+  const { redirectToSignIn } = await auth()
   const [movieId, ...movieNameParts] = movieIdName.split("-");
   const movieName = movieNameParts.join(" ");
 
@@ -73,7 +75,7 @@ const Page = async ({ params }: { params: { movieIdName: string } }) => {
 
   return (
     <Suspense fallback={<Spinner>{null}</Spinner>}>
-      <MovieData movieId={Number(movieId)} movieName={movieName} />
+      <MovieData movieId={Number(movieId)} movieName={movieName} redirectToSignIn={redirectToSignIn} />
     </Suspense>
   );
 };

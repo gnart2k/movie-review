@@ -8,7 +8,7 @@ function ReviewCard({ reviews, username, setReviews }: { filmId?: number, review
 
     const formatDate = useMemo(
         () => (dateString: string) =>
-            new Date(dateString).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }),
+            new Date(dateString).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
         []
     );
 

@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import React, { useState, useEffect } from "react";
-import {CirclePause, Play} from "lucide-react"
+import {CirclePause, CircleStop, Play} from "lucide-react"
 import { useTTSStore } from "@/app/store/TTSStore";
 
 const SpeechComponent = dynamic(() =>
@@ -25,7 +25,6 @@ const SpeechComponent = dynamic(() =>
       const setPlay = useTTSStore(state => state.setPlay)
       const setStop = useTTSStore(state => state.setStop)
 
-      // Load danh sách giọng đọc
       useEffect(() => {
         const synth = window.speechSynthesis;
         const loadVoices = () => {
@@ -42,14 +41,20 @@ const SpeechComponent = dynamic(() =>
 
       // Chọn giọng nói và phát
       const handleVoiceChange = (voiceName: string) => {
+        handlePause()
         setSelectedVoice(voiceName);
+        handlePlay()
       };
 
       const handlePlay = () => {
-        console.log('play')
-        handleStop();
-        setPlay(ttsIndex)
         const synth = window.speechSynthesis;
+        console.log('play')
+        if(synth.paused){
+          synth.resume()
+        }else{
+          handleStop();
+        }
+        setPlay(ttsIndex)
         const utterance = new SpeechSynthesisUtterance(text);
         const selected = voices.find((voice) => voice.name === selectedVoice);
         if (selected) {
@@ -65,10 +70,20 @@ const SpeechComponent = dynamic(() =>
 
       const handleStop = () => {
         const synth = window.speechSynthesis;
-        setStop(ttsIndex)
+        setStop(ttsIndex);
         synth.cancel();
       };
 
+      const handlePause = () => {
+        const synth = window.speechSynthesis;
+        setStop(ttsIndex)
+        // setPause(ttsIndex)
+        synth.pause();
+      };
+
+      const handleRateChange = (e:any) =>{
+        setRate(parseFloat(e.target.value))
+      }
       return (
         <div className="text-white rounded-lg shadow-xl p-1 flex bg-gray-700 rounded-lg mt-2 mx-2">
           {/* Left Section: Controls and Progress */}
@@ -85,11 +100,17 @@ const SpeechComponent = dynamic(() =>
               ) : (
                 <div
                 className=" text-white font-bold rounded-full w-12 h-12 flex items-center justify-center focus:outline-none"
-                  onClick={handleStop}
+                  onClick={handlePause}
                 >
                   <CirclePause/>
                 </div>
               )}
+              <div
+              className=" text-white font-bold rounded-full w-12 h-12 flex items-center justify-center focus:outline-none"
+                  onClick={handleStop}
+                >
+                <CircleStop/>
+              </div>
             </div>
           </div>
 
@@ -126,7 +147,7 @@ const SpeechComponent = dynamic(() =>
                     max="1.5"
                     step="0.1"
                     value={rate}
-                    onChange={(e) => setRate(parseFloat(e.target.value))}
+                    onChange={(e) => handleRateChange(e)}
                     className="w-full bg-gray-800 rounded-full h-2 appearance-none cursor-pointer"
                   />
                   <div className="flex justify-between text-xs text-gray-500">

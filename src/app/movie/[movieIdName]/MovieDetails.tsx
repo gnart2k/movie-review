@@ -16,8 +16,9 @@ import type {
   ReleaseDatesResponse,
 } from "@/types/movieDataAPI.types";
 import Image from "next/image";
-import { useUser } from "@clerk/nextjs";
+import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 import api from "@/lib/utils/axiosInstance";
+import toast from "react-hot-toast";
 
 interface ReleaseDateType {
   day: string;
@@ -118,7 +119,10 @@ function MovieDetail({
     const statsFavorite = async () => {
       if (!movieReviews || movieReviews.length === 0) return;
       if (!movieKeywords || movieKeywords.length === 0) return;
-      if (!user) return;
+      if (!user) {
+        toast.error("Please login to review film")
+        return <RedirectToSignIn/>
+    }
       const keywords = movieKeywords.map((keyword) => keyword.id);
 
       try {

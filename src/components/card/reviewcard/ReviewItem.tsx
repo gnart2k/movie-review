@@ -22,7 +22,7 @@ function ReviewItem({ item, formatDate, setReviews, index}: { item: any, formatD
             return;
         }
         try {
- setIsLoading(true);
+            setIsLoading(true);
             await api.post("/reviews/like", {
                 userId,
                 reviewId,
@@ -180,7 +180,7 @@ function ReviewItem({ item, formatDate, setReviews, index}: { item: any, formatD
                     <div className="text_review pt-2 flex content-center">
                         <span>{totalLike}</span>
                         <button type="button" disabled={isLoading} className="ml-3" onClick={() => toggleLikeHandler(item.id)}>
-                            {isLoading ? "Processing..." : toggleLike ? "❤️" : "🤍"}
+                            {toggleLike ? "❤️" : "🤍"}
                         </button>
                     </div>
                 </>
