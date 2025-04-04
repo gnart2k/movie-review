@@ -1,8 +1,11 @@
 "use client"
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import type { FormEvent, ChangeEvent, MouseEvent } from 'react'
 import '@/styles/components/ui/SearchBar.scss';
+import Dictaphone from '@/components/Dictaphone';
+//@ts-ignore
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
 interface SearchBarProps {
   onSubmit: (searchValue: string) => void;
@@ -13,6 +16,10 @@ export default function SearchBar({ onSubmit }: SearchBarProps) {
   const [searchValue, setSearchValue] = useState("")
   const formRef = useRef<HTMLFormElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const {
+    transcript,
+    listening,
+} = useSpeechRecognition();
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
@@ -34,37 +41,48 @@ export default function SearchBar({ onSubmit }: SearchBarProps) {
     }
   }
 
+  useEffect(()=>{
+    setSearchValue(transcript);
+  },[listening])
+
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className={`search-wrapper ${isFocused ? 'focused' : ''}`}>
-      <input
-        ref={inputRef}
-        autoComplete="off"
-        id="input"
-        type="search"
-        placeholder="Search 'Avatar 2'"
-        value={searchValue}
-        onChange={handleChange}
+    <div className='flex'>
+      <form ref={formRef} onSubmit={handleSubmit} className={`mr-2 search-wrapper ${isFocused ? 'focused' : ''}`}>
+        <input
+          ref={inputRef}
+          autoComplete="off"
+          id="input"
+          type="search"
+          placeholder="Search 'Avatar 2'"
+          value={searchValue}
+          onChange={handleChange}
         // onFocus={() => setIsFocused(true)}
         // onBlur={() => setIsFocused(false)}
-      />
+        />
 
-      <button type="submit" className="search-button" aria-label="Search">
-        <svg
-          className="search-icon"
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-      </button>
-    </form>
+        <button type="submit" className="search-button" aria-label="Search">
+          <svg
+            className="search-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+
+      </form>
+      <Dictaphone enableScript={false} isContinuous={false} />
+      {/* <div>
+        {transcript}
+      </div> */}
+    </div>
   );
 }

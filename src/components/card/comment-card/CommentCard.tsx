@@ -4,12 +4,14 @@ import api from "@/lib/utils/axiosInstance";
 import { MovieCredits } from "@/types/movieDataAPI.types";
 import { useUser } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { RedirectToSignIn } from "@clerk/nextjs";
-
+//@ts-ignore
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import Dictaphone from "@/components/Dictaphone";
 
 interface Review {
     author: string;
@@ -34,6 +36,13 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
     const [aicontent, setAiContent] = useState(contentProp ?? "");
     const [rating, setRating] = useState(ratingProp ?? 0);
     const { user } = useUser();
+    const {
+        transcript,
+        listening,
+        resetTranscript,
+        browserSupportsSpeechRecognition
+    } = useSpeechRecognition();
+
 
     async function createReviewHandler(event: React.FormEvent) {
         event.preventDefault();
@@ -139,6 +148,17 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
         }
     };
 
+    const handleChangeCmt = (e:any)=>{
+        setContent(e.target.value)
+        if(transcript || transcript.length != 0){
+            resetTranscript()
+        }
+    }
+
+    useEffect(()=>{
+        setContent(transcript);
+    },[listening])
+
 
     return (
         <form className="my-6 w-4/5 ml-6" onSubmit={(e) => handleSubmit(e)}>
@@ -181,9 +201,10 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
                     rows={6}
                     className="px-0 w-full text-sm text-black border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800"
                     placeholder="Write a comment..."
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
+                    value={transcript && transcript.length > 0 ? transcript : content}
+                    onChange={handleChangeCmt}
                 />
+            <Dictaphone enableScript={true} isContinuous={true}/>
             </div>
             <button type="submit"
                 className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-black bg-white rounded-lg focus:ring-4">
