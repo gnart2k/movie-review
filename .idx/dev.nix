@@ -6,8 +6,6 @@
   # Use https://search.nixos.org/packages to find packages
   packages = [
     pkgs.nodejs_20
-    pkgs.yarn
-    pkgs.nodePackages.pnpm
     pkgs.bun
     pkgs.openssl_3_2.bin
   ];
@@ -33,15 +31,6 @@
       };
       # To run something each time the workspace is (re)started, use the `onStart` hook
     };
-    # Enable previews and customize configuration
-    previews = {
-      enable = false;
-      previews = {
-        web = {
-          command = ["npm" "run" "dev" "--" "--port" "$PORT" "--hostname" "0.0.0.0"];
-          manager = "web";
-        };
-      };
-    };
+
   };
 }

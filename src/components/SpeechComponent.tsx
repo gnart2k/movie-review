@@ -1,20 +1,10 @@
 'use client'
 
-import dynamic from "next/dynamic";
 import React, { useState, useEffect } from "react";
 import {CirclePause, CircleStop, Play} from "lucide-react"
 import { useTTSStore } from "@/app/store/TTSStore";
 
-const SpeechComponent = dynamic(() =>
-  import("react-text-to-speech").then((mod) => {
-    return function WrappedComponent({ text, ttsIndex}: { text: string, ttsIndex: number}) {
-      const {
-        Text,
-        speechStatus,
-        start,
-        pause,
-        stop,
-      } = mod.useSpeech({ text });
+const SpeechComponent = ({ text, ttsIndex}: { text: string, ttsIndex: number}) =>{
 
       const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
       const [selectedVoice, setSelectedVoice] = useState<string>("");
@@ -161,8 +151,5 @@ const SpeechComponent = dynamic(() =>
         </div>
       );
     };
-  }),
-  { ssr: false }
-);
 
 export default SpeechComponent
