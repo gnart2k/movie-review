@@ -7,10 +7,10 @@ import MovieSection from "@/components/layout/MovieSection";
 import {getAuth } from "@clerk/nextjs/server";
 
 const movieSections = [
-  { title: "Maybe You Like", type: "maybe_you_like" },
-  { title: "Now Playing", type: "now_playing" },
-  { title: "Upcoming", type: "upcoming" },
-  { title: "Top Rate", type: "top_rated" },
+  { title: "Có thể bạn sẽ thích", type: "maybe_you_like" },
+  { title: "Phim đang công chiếu", type: "now_playing" },
+  { title: "Phim sắp chiếu", type: "upcoming" },
+  { title: "Phim đánh giá cao", type: "top_rated" },
 ];
 const Home = async () => {
   return (

@@ -10,6 +10,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@clerk/localizations": "^3.13.5",
     "@clerk/nextjs": "^6.12.2",
     "@google/generative-ai": "^0.2.1",
     "@headlessui/react": "^2.2.0",
@@ -28,6 +29,7 @@
     "lucide": "^0.485.0",
     "lucide-react": "^0.485.0",
     "next": "^15.2.0",
+    "nookies": "^2.5.2",
     "react": "^18.3.1",
     "react-alice-carousel": "^2.7.1",
     "react-dom": "^18.3.1",

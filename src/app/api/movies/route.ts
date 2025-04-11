@@ -17,6 +17,7 @@ export async function GET(req: NextRequest) {
         const response = await axios.get(`https://api.themoviedb.org/3/movie/${query}`, {
             params: {
                 api_key: process.env.TMDB_API_KEY,
+                language: "vi-VN"
             },
         });
         const movies: Movie[] = [];

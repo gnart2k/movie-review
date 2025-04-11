@@ -1,5 +1,6 @@
 "use client"
 import Dictaphone from '@/components/Dictaphone';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import React from 'react';
 //@ts-ignore
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
@@ -16,7 +17,10 @@ const Test = () => {
       <div>
         {transcript}
       </div>
+
+      <LanguageSwitcher/>
     </div>
+
   );
 };
 export default Test;

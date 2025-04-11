@@ -14,6 +14,7 @@ import {
   SignedOut,
   UserButton,
 } from '@clerk/nextjs'
+import { LanguageSwitcher } from "../LanguageSwitcher";
 
 
 const Navbar = () => {

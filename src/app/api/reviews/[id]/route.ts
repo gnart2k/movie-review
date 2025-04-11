@@ -6,14 +6,14 @@ import { z } from "zod"; // Thư viện kiểm tra dữ liệu đầu vào
 
 // Schema kiểm tra dữ liệu đầu vào khi update review
 const updateReviewSchema = z.object({
-    content: z.string().min(1, "Content is required"),
+    content: z.string().optional(),
     rating: z.number().min(0, "Rating must be a non-negative number"),
 });
 
 // Schema kiểm tra dữ liệu đầu vào của review
 const reviewSchema = z.object({
     filmId: z.number().positive("Invalid film ID"),
-    content: z.string().min(1, "Content is required"),
+    content: z.string().optional(),
     created_at: z.preprocess((arg) => new Date(arg as string), z.date()),
     updated_at: z.preprocess((arg) => new Date(arg as string), z.date()),
     url: z.string().url("Invalid URL"),
@@ -63,7 +63,7 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
         const updatedData = await prisma.$transaction(async (tx) => {
             const updatedReview = await tx.review.update({
                 where: { id: params.id },
-                data: { content },
+                data: { content: content ?? "" },
                 select: { authorDetailsId: true },
             });
 
@@ -119,7 +119,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
             data: {
                 id,
                 filmId,
-                content,
+                content: content ?? "",
                 author: author.name ?? author.username ?? "",
                 url,
                 authorDetailsId: authorDetails.id,

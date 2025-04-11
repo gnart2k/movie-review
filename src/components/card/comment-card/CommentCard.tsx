@@ -10,7 +10,7 @@ import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { RedirectToSignIn } from "@clerk/nextjs";
 //@ts-ignore
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import { useSpeechRecognition } from 'react-speech-recognition';
 import Dictaphone from "@/components/Dictaphone";
 
 interface Review {
@@ -48,7 +48,7 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
         event.preventDefault();
         if (!user) {
             toast.error("Please login to review film")
-            return <RedirectToSignIn/>
+            return <RedirectToSignIn />
         }
 
         try {
@@ -94,7 +94,7 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
     const handleSubmit = (e: any) => {
         if (!user) {
             toast.error("Please login to review film")
-            return <RedirectToSignIn/>
+            return <RedirectToSignIn />
         }
         //@ts-ignore
         return isEdit ? updateReviewHandler?.(e, content, rating) : createReviewHandler(e)
@@ -148,20 +148,22 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
         }
     };
 
-    const handleChangeCmt = (e:any)=>{
+    const handleChangeCmt = (e: any) => {
         setContent(e.target.value)
-        if(transcript || transcript.length != 0){
+        if (transcript || transcript.length != 0) {
             resetTranscript()
         }
     }
 
-    useEffect(()=>{
+    useEffect(() => {
         setContent(transcript);
-    },[listening])
+    }, [listening])
 
 
     return (
-        <form className="my-6 w-4/5 ml-6" onSubmit={(e) => handleSubmit(e)}>
+        <form className="my-6 w-4/5 ml-6" onSubmit={(e) => {
+            handleSubmit(e)
+        }}>
             {aicontent && <div className="relative p-8 bg-gradient-to-r from-gray-800 to-gray-700 rounded-lg shadow-md overflow-hidden mb-8">
                 <div className="absolute inset-0 bg-black opacity-10 mix-blend-multiply pointer-events-none" />
                 <div className="absolute inset-0 bg-no-repeat bg-center opacity-10 mix-blend-multiply pointer-events-none" />
@@ -171,7 +173,7 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
                     <p className=" text-sm font-semibold">This content was generated with AI</p>
                 </span>
                 <Markdown remarkPlugins={[remarkGfm]}>{aicontent}</Markdown>
-                <SpeechComponent text={aicontent} ttsIndex={99}/>
+                <SpeechComponent text={aicontent} ttsIndex={99} />
             </div>
             }
             <div className="flex items-center mb-4">
@@ -204,8 +206,8 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
                     value={transcript && transcript.length > 0 ? transcript : content}
                     onChange={handleChangeCmt}
                 />
-            <Dictaphone enableScript={true} isContinuous={true}/>
             </div>
+            <Dictaphone enableScript={true} isContinuous={true} />
             <button type="submit"
                 className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-black bg-white rounded-lg focus:ring-4">
                 {isEdit ? "Update" : "Post Comment"}

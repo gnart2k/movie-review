@@ -30,11 +30,11 @@ const Dictaphone = ({ enableScript, isContinuous }: { enableScript: boolean, isC
         <div className={""}>
             {
                 listening ? (
-                    <button className='p-2 rounded-full text-white bg-white/10' onClick={handleStopListen}>
+                    <button type="button" className='p-2 rounded-full text-white bg-white/10' onClick={handleStopListen}>
                         <MicOff />
                     </button>
                 ) : (
-                    <button className='p-2 rounded-full text-white bg-white/10' onClick={handleStartListen}>
+                    <button type="button" className='p-2 rounded-full text-white bg-white/10' onClick={handleStartListen}>
                         <Mic />
                     </button>
                 )

@@ -6,6 +6,7 @@ import '@/styles/components/ui/SearchBar.scss';
 import Dictaphone from '@/components/Dictaphone';
 //@ts-ignore
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 interface SearchBarProps {
   onSubmit: (searchValue: string) => void;
@@ -53,7 +54,7 @@ export default function SearchBar({ onSubmit }: SearchBarProps) {
           autoComplete="off"
           id="input"
           type="search"
-          placeholder="Search 'Avatar 2'"
+          placeholder="Tìm kiếm tên phim "
           value={searchValue}
           onChange={handleChange}
         // onFocus={() => setIsFocused(true)}
@@ -80,6 +81,10 @@ export default function SearchBar({ onSubmit }: SearchBarProps) {
 
       </form>
       <Dictaphone enableScript={false} isContinuous={false} />
+
+      <div className="w-2/12">
+          <LanguageSwitcher />
+        </div>
       {/* <div>
         {transcript}
       </div> */}

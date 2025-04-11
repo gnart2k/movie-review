@@ -43,7 +43,7 @@ function ReviewItem({ item, formatDate, setReviews, index}: { item: any, formatD
 
         try {
             await api.put("/reviews/" + item.id, {
-                content,
+                content: content ?? "",
                 rating,
             });
             setReviews?.((reviews: Review[]) => reviews.map((review) => review.id === item.id ? { ...review, content: content, author_details: { ...review.author_details, rating: rating } } : review));
