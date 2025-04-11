@@ -31,8 +31,9 @@ export async function GET(req: NextRequest) {
                 likes: { select: { id: true, userId: true } }
             },
             orderBy: { created_at: "desc" },
-            take: 10, // Giới hạn lấy 10 review gần nhất
+            take: 10,
         });
+        console.log(reviews)
 
         return createResponse(true, "Reviews fetched successfully", reviews);
     } catch (error) {

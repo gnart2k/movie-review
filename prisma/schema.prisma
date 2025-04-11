@@ -33,6 +33,7 @@ model Review {
   created_at      DateTime      @default(now())
   updated_at      DateTime      @updatedAt
   url             String
+  comment_evaluation String?      @default("")
 
   likes ReviewLike[]
 }
@@ -61,4 +62,82 @@ model UserCategoryStats {
   count      Int    @default(1)
 
   @@unique([userId, categoryId])
+}
+
+model Movie {
+  id            Int      @id
+  title         String
+  originalTitle String
+  releaseDate   DateTime
+  runtime       Int?
+  overview      String?  @db.Text
+  tagline       String?  @db.Text
+  status        String?
+  popularity    Float
+  rating        Float
+  voteCount     Int
+  posterPath    String?
+  backdropPath  String?
+  homepage      String?
+  originalLang  String   
+  budget        Int?
+  revenue       Int?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  movieGenres   MovieGenre[]
+  movieKeywords MovieKeyword[]
+  movieActors   MovieActor[]
+}
+
+model Genre {
+  id          Int         @id @unique
+  name        String
+  movieGenres MovieGenre[]
+}
+
+model MovieGenre {
+  movieId Int
+  genreId Int
+
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  genre Genre @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@id([movieId, genreId])
+}
+
+model Keyword {
+  id            Int            @id @unique
+  name          String
+  movieKeywords MovieKeyword[]
+}
+
+model MovieKeyword {
+  movieId   Int
+  keywordId Int
+
+  movie   Movie   @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  keyword Keyword @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+
+  @@id([movieId, keywordId])
+}
+
+model Actor {
+  id           Int         @id @unique
+  name         String
+  originalName String
+  gender       Int?
+  popularity   Float
+  profilePath  String?
+  movieActors  MovieActor[]
+}
+
+model MovieActor {
+  movieId Int
+  actorId Int
+
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  actor Actor @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@id([movieId, actorId])
 }

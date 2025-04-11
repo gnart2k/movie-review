@@ -37,8 +37,7 @@ function ReviewItem({ item, formatDate, setReviews, index}: { item: any, formatD
         }
     }
 
-    async function updateReviewHandler(event: React.FormEvent, content: string, rating: number) {
-        event.preventDefault();
+    async function updateReviewHandler(content: string, rating: number) {
         if (!isSignedIn) return;
 
         try {

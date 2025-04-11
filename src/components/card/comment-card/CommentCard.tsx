@@ -12,6 +12,7 @@ import { RedirectToSignIn } from "@clerk/nextjs";
 //@ts-ignore
 import { useSpeechRecognition } from 'react-speech-recognition';
 import Dictaphone from "@/components/Dictaphone";
+import AlertModal from "@/components/ui/AlertModal";
 
 interface Review {
     author: string;
@@ -36,6 +37,7 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
     const [aicontent, setAiContent] = useState(contentProp ?? "");
     const [rating, setRating] = useState(ratingProp ?? 0);
     const { user } = useUser();
+    const [isModalOpen, setIsModalOpen] = useState(false)
     const {
         transcript,
         listening,
@@ -43,9 +45,7 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
         browserSupportsSpeechRecognition
     } = useSpeechRecognition();
 
-
-    async function createReviewHandler(event: React.FormEvent) {
-        event.preventDefault();
+    async function createReviewHandler() {
         if (!user) {
             toast.error("Please login to review film")
             return <RedirectToSignIn />
@@ -91,13 +91,48 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
         }
     }
 
-    const handleSubmit = (e: any) => {
+    const handleSubmit = async (e: any) => {
+        console.log('submit')
         if (!user) {
             toast.error("Please login to review film")
             return <RedirectToSignIn />
         }
+
+        //TODO: check toxic comment before post comment
+        try {
+            if (content.length == 0) return
+
+            const prompt = `You are a content moderation assistant. Your task is to determine if a comment is toxic or not.
+                    A toxic comment includes insults, threats, hate speech, harassment, or any language that could be harmful or offensive.
+                    A non-toxic comment is respectful, constructive, or neutral.
+                    Comment: $${content}
+                    Does this comment contain toxic language? Answer only with:
+                    Toxic
+                    Not Toxic`
+
+            const response = await fetch("/api/gemini", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: prompt, history: [] }),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to generate content");
+            }
+
+            const data = await response.text();
+
+            if (data.toString().trim() === 'Toxic') {
+                setIsModalOpen(true);
+            }else{
+                return isEdit ? updateReviewHandler?.(content, rating) : createReviewHandler()
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Error generating content.");
+        }
+
         //@ts-ignore
-        return isEdit ? updateReviewHandler?.(e, content, rating) : createReviewHandler(e)
     }
 
     const handleAISummaryContent = async () => {
@@ -156,77 +191,90 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
     }
 
     useEffect(() => {
-        setContent(transcript);
-    }, [listening])
-
+        if (!listening && transcript) {
+          setContent(prev => `${prev} ${transcript}`);
+          resetTranscript(); // Clean up after use
+        }
+      }, [listening]);
 
     return (
-        <form className="my-6 w-4/5 ml-6" onSubmit={(e) => {
-            handleSubmit(e)
-        }}>
-            {aicontent && <div className="relative p-8 bg-gradient-to-r from-gray-800 to-gray-700 rounded-lg shadow-md overflow-hidden mb-8">
-                <div className="absolute inset-0 bg-black opacity-10 mix-blend-multiply pointer-events-none" />
-                <div className="absolute inset-0 bg-no-repeat bg-center opacity-10 mix-blend-multiply pointer-events-none" />
-                <div className="relative z-10 text-white" />
-                <span className="flex items-center border rounded-lg bg-dark/10 justify-start p-4 mb-2 w-80">
-                    <svg className="w-4 h-4 mr-2" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M16 8.016A8.522 8.522 0 008.016 16h-.032A8.521 8.521 0 000 8.016v-.032A8.521 8.521 0 007.984 0h.032A8.522 8.522 0 0016 7.984v.032z" fill="url(#prefix__paint0_radial_980_20147)" /><defs><radialGradient id="prefix__paint0_radial_980_20147" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(16.1326 5.4553 -43.70045 129.2322 1.588 6.503)"><stop offset=".067" stopColor="#9168C0" /><stop offset=".343" stopColor="#5684D1" /><stop offset=".672" stopColor="#1BA1E3" /></radialGradient></defs></svg>
-                    <p className=" text-sm font-semibold">This content was generated with AI</p>
-                </span>
-                <Markdown remarkPlugins={[remarkGfm]}>{aicontent}</Markdown>
-                <SpeechComponent text={aicontent} ttsIndex={99} />
-            </div>
-            }
-            <div className="flex items-center mb-4">
-                <span className="flex flex-row-reverse">
-                    <svg className={"w-4 h-4 ms-1 cursor-pointer peer peer-hover:text-yellow-300 hover:text-yellow-300 duration-100" + (rating >= 10 ? " text-yellow-300" : "text-gray-300")} onClick={() => setRating(10)} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                        <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
-                    </svg>
-                    <svg className={"w-4 h-4 ms-1 cursor-pointer peer peer-hover:text-yellow-300 hover:text-yellow-300 duration-100" + (rating >= 8 ? " text-yellow-300" : "text-gray-300")} onClick={() => setRating(8)} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                        <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
-                    </svg>
-                    <svg className={"w-4 h-4 ms-1 cursor-pointer peer peer-hover:text-yellow-300 hover:text-yellow-300 duration-100" + (rating >= 6 ? " text-yellow-300" : "text-gray-300")} onClick={() => setRating(6)} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                        <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
-                    </svg>
-                    <svg className={"w-4 h-4 ms-1 cursor-pointer peer peer-hover:text-yellow-300 hover:text-yellow-300 duration-100" + (rating >= 4 ? " text-yellow-300" : "text-gray-300")} onClick={() => setRating(4)} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                        <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
-                    </svg>
-                    <svg className={"w-4 h-4 ms-1 cursor-pointer peer peer-hover:text-yellow-300 hover:text-yellow-300 duration-100" + (rating >= 2 ? " text-yellow-300" : "text-gray-300")} onClick={() => setRating(2)} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                        <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
-                    </svg>
-                </span>
-            </div>
+        <div>
+            <form className="my-6 w-4/5 ml-6">
+                {aicontent && <div className="relative p-8 bg-gradient-to-r from-gray-800 to-gray-700 rounded-lg shadow-md overflow-hidden mb-8">
+                    <div className="absolute inset-0 bg-black opacity-10 mix-blend-multiply pointer-events-none" />
+                    <div className="absolute inset-0 bg-no-repeat bg-center opacity-10 mix-blend-multiply pointer-events-none" />
+                    <div className="relative z-10 text-white" />
+                    <span className="flex items-center border rounded-lg bg-dark/10 justify-start p-4 mb-2 w-80">
+                        <svg className="w-4 h-4 mr-2" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M16 8.016A8.522 8.522 0 008.016 16h-.032A8.521 8.521 0 000 8.016v-.032A8.521 8.521 0 007.984 0h.032A8.522 8.522 0 0016 7.984v.032z" fill="url(#prefix__paint0_radial_980_20147)" /><defs><radialGradient id="prefix__paint0_radial_980_20147" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(16.1326 5.4553 -43.70045 129.2322 1.588 6.503)"><stop offset=".067" stopColor="#9168C0" /><stop offset=".343" stopColor="#5684D1" /><stop offset=".672" stopColor="#1BA1E3" /></radialGradient></defs></svg>
+                        <p className=" text-sm font-semibold">This content was generated with AI</p>
+                    </span>
+                    <Markdown remarkPlugins={[remarkGfm]}>{aicontent}</Markdown>
+                    <SpeechComponent text={aicontent} ttsIndex={99} />
+                </div>
+                }
+                <div className="flex items-center mb-4">
+                    <span className="flex flex-row-reverse">
+                        <svg className={"w-4 h-4 ms-1 cursor-pointer peer peer-hover:text-yellow-300 hover:text-yellow-300 duration-100" + (rating >= 10 ? " text-yellow-300" : "text-gray-300")} onClick={() => setRating(10)} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                            <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
+                        </svg>
+                        <svg className={"w-4 h-4 ms-1 cursor-pointer peer peer-hover:text-yellow-300 hover:text-yellow-300 duration-100" + (rating >= 8 ? " text-yellow-300" : "text-gray-300")} onClick={() => setRating(8)} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                            <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
+                        </svg>
+                        <svg className={"w-4 h-4 ms-1 cursor-pointer peer peer-hover:text-yellow-300 hover:text-yellow-300 duration-100" + (rating >= 6 ? " text-yellow-300" : "text-gray-300")} onClick={() => setRating(6)} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                            <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
+                        </svg>
+                        <svg className={"w-4 h-4 ms-1 cursor-pointer peer peer-hover:text-yellow-300 hover:text-yellow-300 duration-100" + (rating >= 4 ? " text-yellow-300" : "text-gray-300")} onClick={() => setRating(4)} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                            <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
+                        </svg>
+                        <svg className={"w-4 h-4 ms-1 cursor-pointer peer peer-hover:text-yellow-300 hover:text-yellow-300 duration-100" + (rating >= 2 ? " text-yellow-300" : "text-gray-300")} onClick={() => setRating(2)} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+                            <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
+                        </svg>
+                    </span>
+                </div>
 
-            <div className="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-                <label htmlFor="comment" className="sr-only">Your comment</label>
-                <textarea
-                    id="comment"
-                    rows={6}
-                    className="px-0 w-full text-sm text-black border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800"
-                    placeholder="Write a comment..."
-                    value={transcript && transcript.length > 0 ? transcript : content}
-                    onChange={handleChangeCmt}
-                />
-            </div>
-            <Dictaphone enableScript={true} isContinuous={true} />
-            <button type="submit"
-                className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-black bg-white rounded-lg focus:ring-4">
-                {isEdit ? "Update" : "Post Comment"}
-            </button>
-            <button type="button" onClick={() => handleGerateContent()}
-                className="inline-flex items-center ml-4 py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-600 rounded-lg focus:ring-4">
-                {"Format Review With AI"}
-            </button>
+                <div className="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+                    <label htmlFor="comment" className="sr-only">Your comment</label>
+                    <textarea
+                        id="comment"
+                        rows={6}
+                        className="px-0 w-full text-sm text-black border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800"
+                        placeholder="Write a comment..."
+                        value={transcript && transcript.length > 0 ? transcript : content}
+                        onChange={handleChangeCmt}
+                    />
+                </div>
+                <Dictaphone enableScript={true} isContinuous={true} />
+                <button type="button"
+                onClick={(e) =>handleSubmit(e)}
+                    className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-black bg-white rounded-lg focus:ring-4">
+                    {isEdit ? "Update" : "Post Comment"}
+                </button>
+                <button type="button" onClick={() => handleGerateContent()}
+                    className="inline-flex items-center ml-4 py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-600 rounded-lg focus:ring-4">
+                    {"Format Review With AI"}
+                </button>
 
-            <button type="button" onClick={() => handleAISummaryContent()}
-                className="inline-flex items-center ml-4 py-2.5 px-4 text-xs font-medium text-center text-white bg-orange-600 rounded-lg focus:ring-4">
-                {"Summary Review With AI"}
-            </button>
-            {isEdit && <button type="button"
-                onClick={() => { setEdit?.(false); setIsOpen?.(false); }}
-                className="inline-flex ml-4 items-center py-2.5 px-4 text-xs font-medium text-center text-black bg-stone-200 rounded-lg focus:ring-4">
-                Cancel
-            </button>}
-        </form>)
+                <button type="button" onClick={() => handleAISummaryContent()}
+                    className="inline-flex items-center ml-4 py-2.5 px-4 text-xs font-medium text-center text-white bg-orange-600 rounded-lg focus:ring-4">
+                    {"Summary Review With AI"}
+                </button>
+                {isEdit && <button type="button"
+                    onClick={() => { setEdit?.(false); setIsOpen?.(false); }}
+                    className="inline-flex ml-4 items-center py-2.5 px-4 text-xs font-medium text-center text-black bg-stone-200 rounded-lg focus:ring-4">
+                    Cancel
+                </button>}
+            </form>
+            <AlertModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title="Toxic comment detected. This comment contains language that violates our community guidelines, do you want to continue ?"
+                content=""
+                confirmLabel="Continue"
+                cancelLabel="Cancel"
+                onConfirm={() => {return isEdit ? updateReviewHandler?.(content, rating) : createReviewHandler()}}
+            />
+        </div>
+    )
 }
 
 export default CommentCard;

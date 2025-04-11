@@ -11,6 +11,8 @@ async function getListReview(filmId: number): Promise<Review[]> {
             take: 10,
         });
 
+        console.log(reviews)
+
         // Chuyển đổi Date -> string
         const formattedReviews: Review[] = reviews.map(review => ({
             ...review,
