@@ -6,8 +6,9 @@ import user_icon from "@/assets/image/user_icon.png";
 import Image from "next/image";
 import SpeechComponent from "@/components/SpeechComponent";
 import toast from "react-hot-toast";
+import CommentEvaluation from "@/components/ui/CommentEvaluation";
 
-function ReviewItem({ item, formatDate, setReviews, index}: { item: any, formatDate: Function, setReviews?: Function, index: number}) {
+function ReviewItem({ item, formatDate, setReviews, index }: { item: any, formatDate: Function, setReviews?: Function, index: number }) {
     const [totalLike, setTotalLike] = useState(item.likes.length);
     const [isOpen, setIsOpen] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
@@ -104,7 +105,7 @@ function ReviewItem({ item, formatDate, setReviews, index}: { item: any, formatD
                             <h3>{item.author_details.username}</h3>
                             <div className='flex'>
                                 <div className='rounded_rating'>{item.author_details.rating + "/10"}</div>
-                                <h5 className = 'text-gray-400 font-sm'>
+                                <h5 className='text-gray-400 font-sm'>
                                     {(<span> Written by {item.author.length == 0 ? item.author_details.username : item.author} on {formatDate(item.created_at)} </span>)}
                                 </h5>
                             </div>
@@ -172,15 +173,18 @@ function ReviewItem({ item, formatDate, setReviews, index}: { item: any, formatD
                         </div>}
 
                     </div>
-                    <SpeechComponent text={item.content} ttsIndex={index}/>
+                    <SpeechComponent text={item.content} ttsIndex={index} />
                     <div className='text_review'>
-                    <p dangerouslySetInnerHTML={{ __html: item.content }}></p>
+                        <p dangerouslySetInnerHTML={{ __html: item.content }}></p>
                     </div>
-                    <div className="text_review pt-2 flex content-center">
-                        <span>{totalLike}</span>
-                        <button type="button" disabled={isLoading} className="ml-3" onClick={() => toggleLikeHandler(item.id)}>
-                            {toggleLike ? "❤️" : "🤍"}
-                        </button>
+                    <div className="flex items-center justify-between">
+                        <div className="text_review pt-2 flex content-center">
+                            <span>{totalLike}</span>
+                            <button type="button" disabled={isLoading} className="ml-3" onClick={() => toggleLikeHandler(item.id)}>
+                                {toggleLike ? "❤️" : "🤍"}
+                            </button>
+                        </div>
+                        <CommentEvaluation evaluation={item.comment_evaluation} />
                     </div>
                 </>
             }

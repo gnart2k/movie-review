@@ -77,25 +77,23 @@ const LanguageSwitcher = () => {
   }
 
   return (
-    <div className="text-center text-white bg-white notranslate relative w-40 p-4 z-10" onMouseOver={() => setOnOpen(true)} onMouseOut={() => setOnOpen(false)}>
-      <div className="absolute top-0 flex flex-col bg-slate-100 transition-all duration-200 shadow-sm p-2 min-w-40 cursor-pointer rounded-lg text-slate-800 ">
+    <div className="text-center notranslate relative w-40 p-4 z-10 text-white" onMouseOver={() => setOnOpen(true)} onMouseOut={() => setOnOpen(false)}>
+      <div className="absolute top-0 flex flex-col bg-gray-800 transition-all duration-200 shadow-sm p-2 min-w-12 cursor-pointer rounded-lg">
         {languageConfig.languages.map((ld: LanguageDescriptor, i: number) => (
           <div key={i}>
             {currentLanguage === ld.name ||
               (currentLanguage === "auto" &&
                 languageConfig.defaultLanguage === ld) ? (
-              <span key={`l_s_${ld}`} className="flex items-center backdrop-blur-md mx-3 text-gray-800  font-lightly" >
-                <Globe className="w-4 mr-2" />
+              <span key={`l_s_${ld}`} className="flex items-center backdrop-blur-md mx-3 text-white font-lightly" >
                 {ld.title}
               </span>
             ) : (
-
               <div
                 key={`l_s_${ld}`}
                 onClick={handleChange(ld.name)}
-                className={`mx-3 transition-all duration-200 h-full backdrop-blur-md  text-gray-500 py-2 hover:text-gray-700  cursor-pointer
-                    
-                    `}
+                className={`mx-3 transition-all flex items-center duration-200 h-full backdrop-blur-md text-gray-300 py-2 hover:text-white cursor-pointer ${
+                  !onOpen ? "h-0 hidden" : ""
+                }`}
               >
 
                 {ld.title}
@@ -109,5 +107,3 @@ const LanguageSwitcher = () => {
 };
 
 export { LanguageSwitcher, COOKIE_NAME };
-
-

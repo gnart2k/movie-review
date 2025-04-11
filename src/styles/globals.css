@@ -6,6 +6,18 @@ body{
     background: black;
 }
 
+.VIpgJd-ZVi9od-ORHb-OEVmcd,
+iframe.skiptranslate {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Remove top padding added by Google Translate */
+body {
+  top: 0px !important;
+  position: relative !important;
+}
+
 ::-webkit-scrollbar {
   width: 2px;
   height: 2px;

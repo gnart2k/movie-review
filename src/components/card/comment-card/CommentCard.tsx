@@ -246,7 +246,7 @@ function CommentCard({ filmId, isEdit, setEdit, updateReviewHandler, contentProp
                 <Dictaphone enableScript={true} isContinuous={true} />
                 <button type="button"
                 onClick={(e) =>handleSubmit(e)}
-                    className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-black bg-white rounded-lg focus:ring-4">
+                    className="inline-flex mt-2 items-center py-2.5 px-4 text-xs font-medium text-center text-black bg-white rounded-lg focus:ring-4">
                     {isEdit ? "Update" : "Post Comment"}
                 </button>
                 <button type="button" onClick={() => handleGerateContent()}

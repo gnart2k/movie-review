@@ -88,11 +88,11 @@ export default function RootLayout({
         />
         
       <Script
-        src="/assets/scripts/lang-config.js"
+        src="/scripts/lang-config.js"
         strategy="beforeInteractive"
       />
       <Script
-        src="/assets/scripts/translation.js"
+        src="/scripts/translation.js"
         strategy="beforeInteractive"
       />
       <Script

@@ -13,7 +13,7 @@ const Dictaphone = ({ enableScript, isContinuous }: { enableScript: boolean, isC
     } = useSpeechRecognition();
 
     if (!browserSupportsSpeechRecognition) {
-        return <span>Browser doesn't support speech recognition.</span>;
+        return <span></span>;
     }
 
     const handleStartListen = () => {

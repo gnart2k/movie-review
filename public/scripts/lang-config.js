@@ -1,0 +1,26 @@
+window.__GOOGLE_TRANSLATION_CONFIG__ = {
+    languages: [
+      { title: "English", name: "en" },
+      { title: "Tiếng Việt", name: "vi" },
+      { title: "Deutsch", name: "de" },
+      { title: "Español", name: "es" },
+      { title: "Français", name: "fr" },
+      { title: "한국어", name: "ko" },
+      { title: "中文", name: "zh-CN" },
+      { title: "日本語", name: "ja" },
+      { title: "Русский", name: "ru" },
+      { title: "العربية", name: "ar" },
+      { title: "हिन्दी", name: "hi" },
+      { title: "Português", name: "pt" },
+      { title: "Italiano", name: "it" },
+      { title: "Nederlands", name: "nl" },
+      { title: "Polski", name: "pl" },
+      { title: "Türkçe", name: "tr" },
+      { title: "Svenska", name: "sv" },
+      { title: "ภาษาไทย", name: "th" },
+      { title: "Українська", name: "uk" },
+      { title: "Ελληνικά", name: "el" },
+    ],
+    defaultLanguage: "en",
+  };
+  

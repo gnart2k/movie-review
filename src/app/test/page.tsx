@@ -12,13 +12,10 @@ const Test = () => {
 } = useSpeechRecognition()
 
   return (
-    <div className={"bg-white"}>
-      <Dictaphone enableScript={false} isContinuous={false}/>
-      <div>
-        {transcript}
+    <div className={"bg-white h-screen w-screen flex justify-center items-center"}>
+      <div className = "mt-8">
       </div>
-
-      <LanguageSwitcher/>
+      new series
     </div>
 
   );

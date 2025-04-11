@@ -18,7 +18,6 @@ export async function GET(req: NextRequest) {
                     query,
                     year: new Date().getFullYear(),
                     api_key: process.env.TMDB_API_KEY,
-                    language: "vi-VN"
                 },
             });
         } else {

@@ -13,11 +13,9 @@ export async function GET(req: NextRequest) {
             return createResponse(false, "Missing query parameter", { movies: [] }, 400);
         }
 
-        // Gọi API của TMDB
         const response = await axios.get(`https://api.themoviedb.org/3/movie/${query}`, {
             params: {
                 api_key: process.env.TMDB_API_KEY,
-                language: "vi-VN"
             },
         });
         const movies: Movie[] = [];
