@@ -76,6 +76,38 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
             return { updatedReview, updatedAuthorDetails };
         });
 
+        
+    if (!content || content.length === 0) {
+        const prompt = `
+  You are a content evaluation assistant. Your task is to classify the sentiment of a comment.
+  A Positive comment expresses praise, satisfaction, or favorable feedback.
+  A Negative comment expresses dissatisfaction, complaints, or critical feedback.
+  A Neutral comment is objective, informational, or lacks strong emotion.
+  
+  Comment: "${content}"
+  
+  What is the sentiment of this comment? Answer only with one word:
+  
+  Positive
+  Negative
+  Neutral`;
+  
+        const response = await fetch(`${process.env.NEXT_PUBLIC_DEV_URL}/api/gemini`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: prompt, history: [] }),
+        });
+  
+        if (!response.ok) throw new Error("Failed to generate content");
+  
+        const evaluatedData = await response.text();
+        await prisma.review.update({
+          where: { id: params.id },
+          data: { comment_evaluation: evaluatedData.trim() },
+        });
+      }
+  
+
         return createResponse(true, "Review updated successfully", updatedData);
     } catch (error) {
         console.error(error);
