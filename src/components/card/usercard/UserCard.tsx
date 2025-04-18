@@ -45,7 +45,7 @@ function UserCard({ cast }: UserCardProps) {
               </div>
             )}
             <p>{item.name}</p>
-            <p className="character">{item.character}</p>
+            <p className="character notranslate">{item.character}</p>
           </li>
         );
       })}

@@ -34,7 +34,7 @@ function RecommendationCard({ recommendations }: RecommendationCardProps) {
               height={100}
             />
             <p>{item.title}</p>
-            <p className="character">
+            <p className="character notranslate">
               {(item.vote_average * 10).toFixed(0) + "%"}
             </p>
           </li>

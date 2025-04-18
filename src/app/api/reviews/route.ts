@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
 You are a content evaluation assistant. Your task is to classify the sentiment of a comment.
 A Positive comment expresses praise, satisfaction, or favorable feedback.
 A Negative comment expresses dissatisfaction, complaints, or critical feedback.
-A Neutral comment is objective, informational, or lacks strong emotion.
+A Neutral comment is objective, informational, or lacks strong emotion and contain both positive and negative information.
 
 Comment: "${review.content}"
 
@@ -123,7 +123,7 @@ export async function POST(req: NextRequest) {
 You are a content evaluation assistant. Your task is to classify the sentiment of a comment.
 A Positive comment expresses praise, satisfaction, or favorable feedback.
 A Negative comment expresses dissatisfaction, complaints, or critical feedback.
-A Neutral comment is objective, informational, or lacks strong emotion.
+A Neutral comment is objective, informational, or lacks strong emotion and contain both positive and negative information.
 
 Comment: "${review.content}"
 

@@ -10,32 +10,34 @@ const SpeechComponent = ({ text, ttsIndex}: { text: string, ttsIndex: number}) =
       const [selectedVoice, setSelectedVoice] = useState<string>("");
       const [rate, setRate] = useState<number>(1);
       const [volume, setVolume] = useState<number>(1);
-      const [showSettings, setShowSettings] = useState<boolean>(false);
       const isPlay = useTTSStore(state => state.items[ttsIndex]?.isPlaying)
       const setPlay = useTTSStore(state => state.setPlay)
       const setStop = useTTSStore(state => state.setStop)
 
       useEffect(() => {
         const synth = window.speechSynthesis;
+      
+        //@ts-ignore
         const loadVoices = () => {
-          const availableVoices = synth.getVoices();
-          setVoices(availableVoices);
-          if (availableVoices.length > 0) {
-            availableVoices[0] && setSelectedVoice(availableVoices[0].name);
+          const voices = synth.getVoices();
+          if (voices.length > 0) {
+            setVoices(voices);
+            if(voices[0] != undefined) setSelectedVoice(voices[0].name);
+          } else {
+            // Retry after short delay
+            setTimeout(loadVoices, 100);
           }
         };
-
-        synth.onvoiceschanged = loadVoices;
         loadVoices();
+        synth.onvoiceschanged = loadVoices;
       }, []);
-
       // Chọn giọng nói và phát
       const handleVoiceChange = (voiceName: string) => {
         handlePause()
         setSelectedVoice(voiceName);
         handlePlay()
       };
-
+      
       const handlePlay = () => {
         const synth = window.speechSynthesis;
         console.log('play')

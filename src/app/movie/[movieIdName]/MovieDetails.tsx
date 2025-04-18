@@ -45,7 +45,7 @@ interface PosterHeaderProps {
   averageRating: number;
 }
 
-function MovieDetail({
+function  MovieDetail({
   movieDetails,
   movieReleaseDates,
   movieCredits,
@@ -82,25 +82,25 @@ function MovieDetail({
   const [loading, setLoading] = useState(true);
   const { user } = useUser();
 
+  //Fetch reviews from database
+  const fetchReviews = async () => {
+    if (!movieDetails?.id) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await api.get(`/reviews?filmId=${movieDetails?.id}`);
+      setReviews(response.data.data ?? []);
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Insert and fetch reviews into database
   useEffect(() => {
-    //Fetch reviews from database
-    const fetchReviews = async () => {
-      if (!movieDetails?.id) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const response = await api.get(`/reviews?filmId=${movieDetails?.id}`);
-        setReviews(response.data.data ?? []);
-      } catch (error) {
-        console.error("Error fetching reviews:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     // Insert reviews from moviedb to database
     const insertReviews = async () => {
       if (!movieReviews || movieReviews.length === 0) return;
@@ -322,6 +322,7 @@ function MovieDetail({
           keywords={movieKeywords}
           user={user}
           setReviews={setReviews}
+          fetchReviews={fetchReviews}
         />
       </main>
     </div>
@@ -345,7 +346,7 @@ const PosterHeader: React.FC<PosterHeaderProps> = ({
       <div className="header_poster">
         <section className="ott_title">
           <h1 className="title">
-            <span className="name">{movieDetails.title || "Title"}</span>
+            <span className="name notranslate">{movieDetails.title || "Title"}</span>
             <span className="tag release_date">{releaseDate?.year ? `(${releaseDate?.year})` : <></>}</span>
           </h1>
           <div className="facts">
@@ -410,7 +411,7 @@ const PosterHeader: React.FC<PosterHeaderProps> = ({
           <ol className="leadPeoples">
             {leadPeoples.map((person) => (
               <li key={person.id} className="profile">
-                <strong>{person.name}</strong>
+                <strong className="notranslate">{person.name}</strong>
                 <span className="character">{person.jobs.join(", ")}</span>
               </li>
             ))}

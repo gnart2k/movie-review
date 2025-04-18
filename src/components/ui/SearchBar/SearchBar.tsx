@@ -54,7 +54,7 @@ export default function SearchBar({ onSubmit }: SearchBarProps) {
           autoComplete="off"
           id="input"
           type="search"
-          placeholder="Tìm kiếm tên phim "
+          placeholder="Search film you like "
           value={searchValue}
           onChange={handleChange}
         // onFocus={() => setIsFocused(true)}

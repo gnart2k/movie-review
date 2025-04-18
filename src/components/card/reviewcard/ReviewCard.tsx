@@ -4,7 +4,7 @@ import React, { useMemo } from "react";
 import "@/styles/components/cards/ReviewCard.scss";
 import ReviewItem from "./ReviewItem";
 
-function ReviewCard({ reviews, username, setReviews }: { filmId?: number, reviews: Review[] | null, username?: string | null, setReviews: Function }) {
+function ReviewCard({ reviews, username, setReviews, fetchReviews }: { filmId?: number, reviews: Review[] | null, username?: string | null, setReviews: Function, fetchReviews?: Function }) {
 
     const formatDate = useMemo(
         () => (dateString: string) =>
@@ -16,7 +16,7 @@ function ReviewCard({ reviews, username, setReviews }: { filmId?: number, review
     const ownsReview = reviews?.find((item) => item.author_details?.username === username);
     return (
         <div className="inner_content">
-            {ownsReview ? <ReviewItem index={100} item={ownsReview} formatDate={formatDate} setReviews={setReviews}></ReviewItem> : <></>}
+            {ownsReview ? <ReviewItem index={100} item={ownsReview} formatDate={formatDate} setReviews={setReviews} fetchReviews={fetchReviews}></ReviewItem> : <></>}
             {
                 reviews?.filter((item) => item.author_details?.username != username)
                     .map((item, index) => (

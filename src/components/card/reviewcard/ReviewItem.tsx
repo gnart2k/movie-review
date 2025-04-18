@@ -7,8 +7,9 @@ import Image from "next/image";
 import SpeechComponent from "@/components/SpeechComponent";
 import toast from "react-hot-toast";
 import CommentEvaluation from "@/components/ui/CommentEvaluation";
+import { usePathname } from "next/navigation";
 
-function ReviewItem({ item, formatDate, setReviews, index }: { item: any, formatDate: Function, setReviews?: Function, index: number }) {
+function ReviewItem({ item, formatDate, setReviews, index, fetchReviews }: { item: any, formatDate: Function, setReviews?: Function, index: number, fetchReviews?: Function }) {
     const [totalLike, setTotalLike] = useState(item.likes.length);
     const [isOpen, setIsOpen] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
@@ -46,7 +47,8 @@ function ReviewItem({ item, formatDate, setReviews, index }: { item: any, format
                 content: content ?? "",
                 rating,
             });
-            setReviews?.((reviews: Review[]) => reviews.map((review) => review.id === item.id ? { ...review, content: content, author_details: { ...review.author_details, rating: rating } } : review));
+            fetchReviews?.();
+            // setReviews?.((reviews: Review[]) => reviews.map((review) => review.id === item.id ? { ...review, content: content, author_details: { ...review.author_details, rating: rating } } : review));
             setIsOpen(false);
             setIsEdit(false)
         } catch (error) {
@@ -173,6 +175,7 @@ function ReviewItem({ item, formatDate, setReviews, index }: { item: any, format
                         </div>}
 
                     </div>
+                    {/* Phát bình luận bằng âm thanh  */}
                     <SpeechComponent text={item.content} ttsIndex={index} />
                     <div className='text_review'>
                         <p dangerouslySetInnerHTML={{ __html: item.content }}></p>

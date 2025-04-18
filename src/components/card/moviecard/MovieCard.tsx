@@ -64,7 +64,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, isLoading }) => {
           />
         ) : <></>} */}
         <div className="movie-info" style={{ opacity: isImageLoaded ? 1 : 0 }}>
-          <h3>{movie.title}</h3>
+          <h3 className="notranslate">{movie.title}</h3>
         </div>
       </>
     );

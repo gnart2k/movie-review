@@ -6,12 +6,14 @@ import Slider from "@/components/layout/Slider";
 import MovieSection from "@/components/layout/MovieSection";
 import {getAuth } from "@clerk/nextjs/server";
 
+// Xem danh mục phim 
 const movieSections = [
   { title: "Maybe you like", type: "maybe_you_like" },
   { title: "Now playing", type: "now_playing" },
   { title: "Upcoming", type: "upcoming" },
   { title: "Top rated", type: "top_rated" },
 ];
+
 const Home = async () => {
   return (
     <div className="home">

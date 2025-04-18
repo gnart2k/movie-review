@@ -41,7 +41,7 @@ const Slider = () => {
             quality={75}
             priority={true}
           />
-          <h2>
+          <h2 className="notranslate">
             {item.title}
             <br />
             <span data-movie_id={item.id} data-movie_name={item.title}>

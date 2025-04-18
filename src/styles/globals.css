@@ -28,3 +28,8 @@ body {
 ::-webkit-scrollbar-thumb {
   background-color: rgb(62, 62, 62);
 }
+
+form.cl-internal-ae6s9q .cl-formButtonPrimary {
+  display: none;
+}
+
