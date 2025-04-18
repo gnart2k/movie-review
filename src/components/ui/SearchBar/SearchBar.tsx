@@ -3,11 +3,16 @@
 import { useState, useRef, useEffect } from 'react'
 import type { FormEvent, ChangeEvent, MouseEvent } from 'react'
 import '@/styles/components/ui/SearchBar.scss';
-import Dictaphone from '@/components/Dictaphone';
 //@ts-ignore
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
+import dynamic from 'next/dynamic';
+
+// Load Dictaphone only on the client
+const Dictaphone = dynamic(() => import('@/components/Dictaphone'), {
+  ssr: false,
+});
 interface SearchBarProps {
   onSubmit: (searchValue: string) => void;
 }
@@ -80,7 +85,9 @@ export default function SearchBar({ onSubmit }: SearchBarProps) {
         </button>
 
       </form>
-      <Dictaphone enableScript={false} isContinuous={false} />
+      <div>
+        <Dictaphone enableScript={false} isContinuous={false} />
+      </div>
 
       <div className="w-2/12">
           <LanguageSwitcher />

@@ -4,6 +4,7 @@ import React from 'react';
 //@ts-ignore
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
+
 const Dictaphone = ({ enableScript, isContinuous }: { enableScript: boolean, isContinuous: boolean }) => {
     const {
         transcript,
@@ -13,7 +14,7 @@ const Dictaphone = ({ enableScript, isContinuous }: { enableScript: boolean, isC
     } = useSpeechRecognition();
 
     if (!browserSupportsSpeechRecognition) {
-        return <span></span>;
+        return
     }
 
     const handleStartListen = () => {
@@ -27,7 +28,7 @@ const Dictaphone = ({ enableScript, isContinuous }: { enableScript: boolean, isC
     
 
     return (
-        <div className={""}>
+        <div>
             {
                 listening ? (
                     <button type="button" className='p-2 rounded-full text-white bg-white/10' onClick={handleStopListen}>
@@ -39,8 +40,6 @@ const Dictaphone = ({ enableScript, isContinuous }: { enableScript: boolean, isC
                     </button>
                 )
             }
-            {/* <button onClick={resetTranscript}>Reset</button>
-            <p>{transcript}</p> */}
         </div>
     );
 };

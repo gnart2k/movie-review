@@ -58,7 +58,7 @@ interface ContentProps {
 
 
 function Content(props: ContentProps) {
-  const [aicontent, setAiContent] = useState("this is content");
+  const [aicontent, setAiContent] = useState("");
   const { user } = useUser();
 
 

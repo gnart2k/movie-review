@@ -9,8 +9,12 @@ import toast from "react-hot-toast";
 import { RedirectToSignIn } from "@clerk/nextjs";
 //@ts-ignore
 import { useSpeechRecognition } from 'react-speech-recognition';
-import Dictaphone from "@/components/Dictaphone";
+
+const Dictaphone = dynamic(() => import('@/components/Dictaphone'), {
+  ssr: false,
+});
 import AlertModal from "@/components/ui/AlertModal";
+import dynamic from "next/dynamic";
 
 interface Review {
     author: string;
